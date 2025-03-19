@@ -17,37 +17,54 @@
     ```
     $ mysql -u [root] -p
     Enter password:
-    mysql> source ./Member.sql;
+    mysql> source ./SP2025S.sql;
     mysql> show databases;
     +--------------------+
     | Database           |
     +--------------------+
-    | Member             |
+    | SP2025S            |
     +--------------------+
     1 rows in set (0.00 sec)
     mysql> show tables;
-    +------------------+
-    | Tables_in_Member |
-    +------------------+
-    | student          |
-    +------------------+
-    1 row in set (0.00 sec)
+    +-------------------+
+    | Tables_in_SP2025S |
+    +-------------------+
+    | attendance        |
+    | dept              |
+    | instructor        |
+    | section           |
+    | student           |
+    | team              |
+    +-------------------+
+    6 rows in set (0.01 sec)
     ```
+- 학생 테이블 조회
     ```
     mysql> select * from student;
-    +------------+-------+------+-----+
-    | student_id | major | name | sex |
-    +------------+-------+------+-----+
-    | 21-001     | AIC   | Kim  | M   |
-    | 21-002     | AIC   | Shin | M   |
-    | 21-103     | CSE   | Lee  | F   |
-    | 22-101     | CSE   | Choi | M   |
-    | 22-102     | CSE   | Kim  | M   |
-    | 22-203     | SWE   | Son  | F   |
-    | 23-001     | AIC   | Lee  | M   |
-    | 23-101     | CSE   | Kim  | M   |
-    +------------+-------+------+-----+
-    8 rows in set (0.00 sec)
+    +------------+---------+------+-----------------+----------+
+    | student_id | dept_id | name | team_id         | position |
+    +------------+---------+------+-----------------+----------+
+    | 21-001     | AIC     | Kim  | 01-001SP2025S-1 | leader   |
+    | 21-002     | AIC     | Kim  | 01-001SP2025S-1 | member   |
+    | 21-003     | AIC     | Lee  | 01-001SP2025S-1 | member   |
+    | 21-004     | AIC     | Shin | 01-001SP2025S-1 | member   |
+    | 21-005     | AIC     | Park | 01-001SP2025S-2 | leader   |
+    | 21-006     | AIC     | Kim  | 01-001SP2025S-2 | member   |
+    | 21-201     | EEE     | Lee  | 01-001SP2025S-2 | member   |
+    | 21-301     | GME     | Lee  | 01-001SP2025S-2 | member   |
+    | 22-001     | AIC     | Park | 01-001SP2025S-3 | leader   |
+    | 22-002     | AIC     | Kim  | 01-001SP2025S-3 | member   |
+    | 22-003     | AIC     | Choi | 01-001SP2025S-3 | member   |
+    | 23-001     | AIC     | Kim  | 01-001SP2025S-3 | member   |
+    | 23-002     | AIC     | Lee  | 01-001SP2025S-4 | leader   |
+    | 23-003     | AIC     | Son  | 01-001SP2025S-4 | member   |
+    | 23-004     | AIC     | Kim  | 01-001SP2025S-4 | member   |
+    | 23-005     | AIC     | Han  | 01-001SP2025S-4 | member   |
+    | 23-006     | AIC     | Seo  | 01-001SP2025S-5 | leader   |
+    | 23-007     | AIC     | Kim  | 01-001SP2025S-5 | member   |
+    | 23-301     | GME     | Jeon | 01-001SP2025S-5 | member   |
+    | 24-001     | AIC     | Lee  | 01-001SP2025S-5 | member   |
+    +------------+---------+------+-----------------+----------+
     ```
 - MySQL 종료
     ```
@@ -55,5 +72,5 @@
     Bye
     $
     ```
-- test
-    <img src="./demo/test.png">
+- test: 팀장으로 지정된 학생 조회
+    <img src="./demo/test2.png">
