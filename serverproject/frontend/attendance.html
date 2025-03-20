@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>출결 확인</title>
+    <link rel="stylesheet" href="css/main.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>  <!-- 캘린더 라이브러리 -->
+    <script src="./js/loadNav.js" defer></script>
+</head>
+<body>
+    <!-- 공통 네비게이션 바 로드 -->
+    <div id="nav-container"></div>
+
+    
+    <!-- 출결 관리 섹션 -->
+    <main>
+        <!-- 오늘의 출결 확인 -->
+        <section class="attendance-section">
+            <h2>출결 확인</h2>
+            <div class="attendance-today">
+                <h3>오늘</h3>
+                <div id="attendance-checklist">
+                    <!-- 팀원 출석 체크박스가 여기에 추가됨 -->
+                </div>
+                <button id="submit-attendance">출석 완료</button>
+                <p id="attendance-timestamp">타임스탬프: -</p>
+            </div>
+        </section>
+
+        <!-- 출결 기록 조회 (캘린더 기능 추가) -->
+        <section class="attendance-history">
+            <h2>날짜별 출결 확인</h2>
+            <input type="text" id="calendar" placeholder="날짜 선택">
+            <table>
+                <thead>
+                    <tr>
+                        <th>이름</th>
+                        <th>출석 상태</th>
+                        <th>출결 시간</th>
+                    </tr>
+                </thead>
+                <tbody id="history-list">
+                    <!-- 과거 출결 데이터가 여기에 표시됨 -->
+                </tbody>
+            </table>
+        </section>
+    </main>
+
+    <script src="js/attendance.js"></script>
+</body>
+</html>
