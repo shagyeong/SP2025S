@@ -1,0 +1,164 @@
+/* 전체 페이지 스타일 */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f5f5f5;
+}
+
+/* 네비게이션 바 스타일 */
+.navbar {
+    background-color: #333;
+    color: white;
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.menu {
+    display: flex;
+    gap: 20px;
+}
+
+.menu a {
+    color: white;
+    text-decoration: none;
+}
+
+/* 메인 컨테이너 레이아웃 */
+.container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    padding: 20px;
+}
+
+/* 공통 박스 스타일 */
+.box {
+    background: white;
+    padding: 15px;
+    border-radius: 5px;
+    box-shadow: 2px 2px 10px rgba(0,0,0,0.1);
+}
+
+/* 채팅 박스 스타일 */
+.chat-box {
+    height: 200px;
+    overflow-y: auto;
+    border: 1px solid #ddd;
+    padding: 10px;
+}
+
+.input-area {
+    display: flex;
+    margin-top: 10px;
+}
+
+.input-area input {
+    flex: 1;
+    padding: 5px;
+}
+
+.input-area button {
+    padding: 5px 10px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+
+/* 출결 관리 페이지 스타일 */
+.attendance-section, .attendance-history {
+    width: 80%;
+    margin: 20px auto;
+    padding: 20px;
+    background: white;
+    border-radius: 5px;
+    box-shadow: 2px 2px 10px rgba(0,0,0,0.1);
+}
+
+.attendance-today {
+    text-align: center;
+}
+
+#attendance-checklist {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin: 10px 0;
+}
+
+.attendance-history table {
+    width: 100%;
+    margin-top: 10px;
+    border-collapse: collapse;
+}
+
+.attendance-history th, .attendance-history td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: center;
+}
+
+#calendar {
+    display: block;
+    margin: 10px auto;
+    padding: 5px;
+    font-size: 16px;
+    text-align: center;
+}
+
+/* 장소 예약 페이지 스타일 */
+.reservation-section, .reservation-history {
+    width: 80%;
+    margin: 20px auto;
+    padding: 20px;
+    background: white;
+    border-radius: 5px;
+    box-shadow: 2px 2px 10px rgba(0,0,0,0.1);
+}
+
+.reservation-section select, .reservation-section input {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.reservation-section button {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.reservation-section button:hover {
+    background-color: #45a049;
+}
+
+.reservation-history table {
+    width: 100%;
+    margin-top: 10px;
+    border-collapse: collapse;
+}
+
+.reservation-history th, .reservation-history td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: center;
+}
+
+#date-picker {
+    display: block;
+    margin: 10px auto;
+    padding: 5px;
+    font-size: 16px;
+    text-align: center;
+}
