@@ -27,11 +27,11 @@ CREATE TABLE `dept`(
 LOCK TABLES `dept` WRITE;
 /*!40000 ALTER TABLE `dept` DISABLE KEYS */;
 INSERT INTO `dept` VALUES
-    ('AIC', 'Artificial Intelligence Convergence'),
-    ('CSE', 'Computer Science and Engineering'),
-    ('EEE', 'Electrical and Electronics Engineering'),
-    ('GME', 'Global Media'),
-    ('SWE', 'Software Engineering');
+    ('AIC', 'AI 융합학부'),
+    ('CSE', '컴퓨터학부'),
+    ('EEE', '전기전자공학부'),
+    ('GME', '글로벌미디어학부'),
+    ('SWE', '소프트웨어학부');
 /*!40000 ALTER TABLE `dept` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -43,11 +43,12 @@ DROP TABLE IF EXISTS `section`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `section`(
     `section_id` varchar(8) NOT NULL,
-    `year` varchar(4) NOT NULL,
+    `section_year` varchar(4) NOT NULL,
     `semester` varchar(1) NOT NULL,
+    `class` varchar(6) NOT NULL,
     `dept_id` varchar(3) NOT NULL,
     `name` varchar(50) NOT NULL,
-    PRIMARY KEY (`section_id`, `year`, `semester`),
+    PRIMARY KEY (`section_id`, `section_year`, `semester`, `class`),
     KEY `dept_id` (`dept_id`),
     CONSTRAINT `section_fk_1` FOREIGN KEY (`dept_id`)
     REFERENCES `dept` (`dept_id`) ON DELETE CASCADE
@@ -56,18 +57,23 @@ CREATE TABLE `section`(
 LOCK TABLES `section` WRITE;
 /*!40000 ALTER TABLE `section` DISABLE KEYS */;
 INSERT INTO `section` VALUES
-    ('01-001SP', '2023', 'S', 'AIC', 'Server Programming'),
-    ('01-001SP', '2024', 'S', 'AIC', 'Server Programming'),
-    ('01-001SP', '2025', 'S', 'AIC', 'Server Programming'),
-    ('01-002MP', '2023', 'F', 'AIC', 'Mobile Programming'),
-    ('01-002MP', '2024', 'F', 'AIC', 'Mobile Programming'),
-    ('01-002MP', '2025', 'F', 'AIC', 'Mobile Programming');
+    ('01-001SP', '2024', 'S', '(가)', 'AIC', '서버프로그래밍'),
+    ('01-001SP', '2024', 'S', '(나)', 'AIC', '서버프로그래밍'),
+    ('01-001SP', '2025', 'S', '(가)', 'AIC', '서버프로그래밍'),
+    ('01-001SP', '2025', 'S', '(나)', 'AIC', '서버프로그래밍'),
+    ('01-002MP', '2024', 'F', '(가)', 'AIC', '모바일프로그래밍'),
+    ('01-002MP', '2024', 'F', '(나)', 'AIC', '모바일프로그래밍'),
+    ('01-002MP', '2025', 'F', '(가)', 'AIC', '모바일프로그래밍'),
+    ('01-002MP', '2025', 'F', '(나)', 'AIC', '모바일프로그래밍');
 /*!40000 ALTER TABLE `section` ENABLE KEYS */;
 UNLOCK TABLES;
 
 
 
 /* team */
+-- 조 편성: 분반 통합
+-- (가)반: 1, 2, 3조
+-- (나)반: 4, 5, 6조
 DROP TABLE IF EXISTS `team`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
@@ -75,6 +81,10 @@ CREATE TABLE `team`(
     `team_id` varchar(15) NOT NULL,
     `name` varchar(20) DEFAULT NULL,
     `leader_id` varchar(6) DEFAULT NULL,
+    `mate1_id` varchar(6) DEFAULT NULL,
+    `mate2_id` varchar(6) DEFAULT NULL,
+    `mate3_id` varchar(6) DEFAULT NULL,
+    `mate4_id` varchar(6) DEFAULT NULL,
     PRIMARY KEY (`team_id`),
     KEY `leader_id` (`leader_id`),
     CONSTRAINT `team_fk_1` FOREIGN KEY (`leader_id`)
@@ -84,12 +94,24 @@ CREATE TABLE `team`(
 LOCK TABLES `team` WRITE;
 /*!40000 ALTER TABLE `team` DISABLE KEYS */;
 INSERT INTO `team` VALUES
-    -- 2025 봄학기 서버프로그래밍 1 ~ 5조
-    ('01-001SP2025S-1', 'Alpha',   '21-001'),
-    ('01-001SP2025S-2', 'Bravo',   '21-005'),
-    ('01-001SP2025S-3', 'Charlie', '22-001'),
-    ('01-001SP2025S-4', 'Delta',   '23-002'),
-    ('01-001SP2025S-5', 'Echo',    '23-006');
+    -- 2025 봄학기 서버프로그래밍 1 ~ 6조
+    -- (가)반
+    ('01-001SP2025S-1', '1조 Alpha',   '21-001', '21-002', '21-003', '21-004', NULL),
+    ('01-001SP2025S-2', '2조 Bravo',   '21-005', '21-006', '21-007', '21-008', NULL),
+    ('01-001SP2025S-3', '3조 Charlie', '22-001', '22-002', '22-003', '22-004', NULL),
+    -- (나)반
+    ('01-001SP2025S-4', '4조 Delta',   '23-001', '23-002', '23-003', '23-004', NULL),
+    ('01-001SP2025S-5', '5조 Echo',    '23-005', '23-006', '23-007', '23-008', NULL),
+    ('01-001SP2025S-6', '6조 Foxtrot', '23-009', '24-001', '24-002', '24-003', NULL),
+    -- 2025 가을학기 모바일프로그래밍 1 ~ 6조
+    -- (가)반
+    ('01-002MP2025F-1', '1조 Apple',   '21-001', '21-002', '21-005', '21-006', NULL),
+    ('01-002MP2025F-2', '2조 Banana',  '22-001', '22-002', '23-001', '23-002', NULL),
+    ('01-002MP2025F-3', '3조 Cat',     '23-005', '23-006', '23-009', '24-001', NULL),
+    -- (나)반
+    ('01-002MP2025F-4', '4조 Dog',     '21-003', '21-004', '21-007', '21-008', NULL),
+    ('01-002MP2025F-5', '5조 Elephant','22-003', '22-004', '23-003', '23-004', NULL),
+    ('01-002MP2025F-6', '6조 Fox',     '23-007', '23-008', '24-002', '24-003', NULL);
 /*!40000 ALTER TABLE `team` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -174,38 +196,42 @@ DROP TABLE IF EXISTS `student`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `student`(
     `student_id` varchar(6) NOT NULL,
-    `dept_id` varchar(3) NOT NULL,
-    `name` varchar(20) NOT NULL,
+    `dept_id` varchar(3) DEFAULT NULL,
+    `name` varchar(20) DEFAULT NULL,
     PRIMARY KEY (`student_id`),
     KEY `dept_id` (`dept_id`),
     CONSTRAINT `student_fk_1` FOREIGN KEY (`dept_id`)
-    REFERENCES `dept` (`dept_id`) ON DELETE CASCADE
+    REFERENCES `dept` (`dept_id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 LOCK TABLES `student` WRITE;
 /*!40000 ALTER TABLE `student` DISABLE KEYS */;
 INSERT INTO `student` VALUES
-    -- 2025 봄학기 재학생
-    ('21-001', 'AIC', 'Kim'),
-    ('21-002', 'AIC', 'Kim'),
-    ('21-003', 'AIC', 'Lee'),
-    ('21-004', 'AIC', 'Shin'),
-    ('21-005', 'AIC', 'Park'),
-    ('21-006', 'AIC', 'Kim'),
-    ('21-201', 'EEE', 'Lee'),
-    ('21-301', 'GME', 'Lee'),
-    ('22-001', 'AIC', 'Park'),
-    ('22-002', 'AIC', 'Kim'),
-    ('22-003', 'AIC', 'Choi'),
-    ('23-001', 'AIC', 'Kim'),
-    ('23-002', 'AIC', 'Lee'),
-    ('23-003', 'AIC', 'Son'),
-    ('23-004', 'AIC', 'Kim'),
-    ('23-005', 'AIC', 'Han'),
-    ('23-006', 'AIC', 'Seo'),
-    ('23-007', 'AIC', 'Kim'),
-    ('23-301', 'GME', 'Jeon'),
-    ('24-001', 'AIC', 'Lee');
+    -- 2025 봄, 가을학기 재학생
+    ('21-001', 'AIC', '강승진'),
+    ('21-002', 'AIC', '강윤수'),
+    ('21-003', 'AIC', '구민지'),
+    ('21-004', 'AIC', '김미영'),
+    ('21-005', 'AIC', '나현우'),
+    ('21-006', 'AIC', '박재은'),
+    ('21-007', 'AIC', '송하경'),
+    ('21-008', 'AIC', '황수하'),
+    ('22-001', 'AIC', '김민지'),
+    ('22-002', 'AIC', '김수미'),
+    ('22-003', 'AIC', '도기범'),
+    ('22-004', 'AIC', '안정수'),
+    ('23-001', 'AIC', '김우진'),
+    ('23-002', 'AIC', '김재민'),
+    ('23-003', 'AIC', '방수현'),
+    ('23-004', 'AIC', '유하경'),
+    ('23-005', 'AIC', '윤지성'),
+    ('23-006', 'AIC', '차현석'),
+    ('23-007', 'AIC', '허지우'),
+    ('23-008', 'AIC', '황승빈'),
+    ('23-009', 'AIC', '황지수'),
+    ('24-001', 'AIC', '김재만'),
+    ('24-002', 'AIC', '박철수'),
+    ('24-003', 'AIC', '우태현');
 /*!40000 ALTER TABLE `student` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -217,21 +243,108 @@ DROP TABLE IF EXISTS `instructor`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `instructor`(
     `instructor_id` varchar(6) NOT NULL,
-    `dept_id` varchar(3) NOT NULL,
-    `name` varchar(20) NOT NULL,
+    `dept_id` varchar(3) DEFAULT NULL,
+    `name` varchar(20) DEFAULT NULL,
     PRIMARY KEY (`instructor_id`),
     KEY `dept_id` (`dept_id`),
     CONSTRAINT `instructor_fk_1` FOREIGN KEY (`dept_id`)
-    REFERENCES `dept` (`dept_id`) ON DELETE CASCADE
+    REFERENCES `dept` (`dept_id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 LOCK TABLES `instructor` WRITE;
 /*!40000 ALTER TABLE `instructor` DISABLE KEYS */;
 INSERT INTO `instructor` VALUES
-    ('98-901', 'AIC', 'Kim'),
-    ('05-901', 'AIC', 'Lee'),
-    ('05-902', 'AIC', 'Park');
+    ('98-901', 'AIC', '안승효'),
+    ('05-901', 'AIC', '이민준');
 /*!40000 ALTER TABLE `instructor` ENABLE KEYS */;
+UNLOCK TABLES;
+
+
+
+/* student 'takes' section */
+DROP TABLE IF EXISTS `takes`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `takes`(
+    `student_id` varchar(6) NOT NULL,
+    `section_id` varchar(8) NOT NULL,
+    `section_year` varchar(4) NOT NULL,
+    `semester` varchar(1) NOT NULL,
+    `class` varchar(6) NOT NULL,
+    PRIMARY KEY (`student_id`, `section_id`, `section_year`, `semester`, `class`),
+    KEY `student_id` (`student_id`),
+    CONSTRAINT `takes_fk_1` FOREIGN KEY (`student_id`)
+    REFERENCES `student` (`student_id`) ON DELETE CASCADE,
+    KEY `section_id` (`section_id`, `section_year`, `semester`, `class`),
+    CONSTRAINT `takes_fk2` FOREIGN KEY (`section_id`, `section_year`, `semester`, `class`)
+    REFERENCES `section` (`section_id`, `section_year`, `semester`, `class`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+LOCK TABLES `takes` WRITE;
+/*!40000 ALTER TABLE `takes` DISABLE KEYS */;
+INSERT INTO `takes` VALUES
+    -- 서버프로그래밍 수강 정보                    -- 모바일프로그래밍 수강 정보
+    ('21-001', '01-001SP', '2025', 'S', '(가)'), ('21-001', '01-002MP', '2025', 'F', '(가)'),
+    ('21-002', '01-001SP', '2025', 'S', '(가)'), ('21-002', '01-002MP', '2025', 'F', '(가)'),
+    ('21-003', '01-001SP', '2025', 'S', '(가)'), ('21-003', '01-002MP', '2025', 'F', '(나)'),
+    ('21-004', '01-001SP', '2025', 'S', '(가)'), ('21-004', '01-002MP', '2025', 'F', '(나)'),
+    ('21-005', '01-001SP', '2025', 'S', '(가)'), ('21-005', '01-002MP', '2025', 'F', '(가)'),
+    ('21-006', '01-001SP', '2025', 'S', '(가)'), ('21-006', '01-002MP', '2025', 'F', '(가)'),
+    ('21-007', '01-001SP', '2025', 'S', '(가)'), ('21-007', '01-002MP', '2025', 'F', '(나)'),
+    ('21-008', '01-001SP', '2025', 'S', '(가)'), ('21-008', '01-002MP', '2025', 'F', '(나)'),
+    ('22-001', '01-001SP', '2025', 'S', '(가)'), ('22-001', '01-002MP', '2025', 'F', '(가)'),
+    ('22-002', '01-001SP', '2025', 'S', '(가)'), ('22-002', '01-002MP', '2025', 'F', '(가)'),
+    ('22-003', '01-001SP', '2025', 'S', '(가)'), ('22-003', '01-002MP', '2025', 'F', '(나)'),
+    ('22-004', '01-001SP', '2025', 'S', '(가)'), ('22-004', '01-002MP', '2025', 'F', '(나)'),
+    ('23-001', '01-001SP', '2025', 'S', '(나)'), ('23-001', '01-002MP', '2025', 'F', '(가)'),
+    ('23-002', '01-001SP', '2025', 'S', '(나)'), ('23-002', '01-002MP', '2025', 'F', '(가)'),
+    ('23-003', '01-001SP', '2025', 'S', '(나)'), ('23-003', '01-002MP', '2025', 'F', '(나)'),
+    ('23-004', '01-001SP', '2025', 'S', '(나)'), ('23-004', '01-002MP', '2025', 'F', '(나)'),
+    ('23-005', '01-001SP', '2025', 'S', '(나)'), ('23-005', '01-002MP', '2025', 'F', '(가)'),
+    ('23-006', '01-001SP', '2025', 'S', '(나)'), ('23-006', '01-002MP', '2025', 'F', '(가)'),
+    ('23-007', '01-001SP', '2025', 'S', '(나)'), ('23-007', '01-002MP', '2025', 'F', '(나)'),
+    ('23-008', '01-001SP', '2025', 'S', '(나)'), ('23-008', '01-002MP', '2025', 'F', '(나)'),
+    ('23-009', '01-001SP', '2025', 'S', '(나)'), ('23-009', '01-002MP', '2025', 'F', '(가)'),
+    ('24-001', '01-001SP', '2025', 'S', '(나)'), ('24-001', '01-002MP', '2025', 'F', '(가)'),
+    ('24-002', '01-001SP', '2025', 'S', '(나)'), ('24-002', '01-002MP', '2025', 'F', '(나)'),
+    ('24-003', '01-001SP', '2025', 'S', '(나)'), ('24-003', '01-002MP', '2025', 'F', '(나)');
+
+/*!40000 ALTER TABLE `takes` ENABLE KEYS */;
+UNLOCK TABLES;
+
+
+
+/* instructor teaches section */
+DROP TABLE IF EXISTS `teaches`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `teaches`(
+    `instructor_id` varchar(6) NOT NULL,
+    `section_id` varchar(8) NOT NULL,
+    `section_year` varchar(4) NOT NULL,
+    `semester` varchar(1) NOT NULL,
+    `class` varchar(6) NOT NULL,
+    PRIMARY KEY (`instructor_id`, `section_id`, `section_year`, `semester`, `class`),
+    KEY `instructor_id` (`instructor_id`),
+    CONSTRAINT `teaches_fk_1` FOREIGN KEY (`instructor_id`)
+    REFERENCES `instructor` (`instructor_id`) ON DELETE CASCADE,
+    KEY `section_id` (`section_id`, `section_year`, `semester`, `class`),
+    CONSTRAINT `teaches_fk2` FOREIGN KEY (`section_id`, `section_year`, `semester`, `class`)
+    REFERENCES `section` (`section_id`, `section_year`, `semester`, `class`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+LOCK TABLES `teaches` WRITE;
+/*!40000 ALTER TABLE `teaches` DISABLE KEYS */;
+INSERT INTO `teaches` VALUES
+    ('98-901', '01-001SP', '2024', 'S', '(가)'),
+    ('98-901', '01-001SP', '2024', 'S', '(나)'),
+    ('98-901', '01-001SP', '2025', 'S', '(가)'),
+    ('98-901', '01-001SP', '2025', 'S', '(나)'),
+    ('05-901', '01-002MP', '2024', 'F', '(가)'),
+    ('05-901', '01-002MP', '2024', 'F', '(나)'),
+    ('05-901', '01-002MP', '2025', 'F', '(가)'),
+    ('05-901', '01-002MP', '2025', 'F', '(나)');
+/*!40000 ALTER TABLE `teaches` ENABLE KEYS */;
 UNLOCK TABLES;
 
 
