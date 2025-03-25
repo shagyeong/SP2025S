@@ -39,6 +39,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'mainpage',
     'team',
+    'reservation',
+    'attendance',
+    'chat',
 ]
 
 MIDDLEWARE = [
