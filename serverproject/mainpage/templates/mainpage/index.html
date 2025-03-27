@@ -1,0 +1,56 @@
+<!-- 메인 페이지-->
+{% extends "mainpage/base.html" %}
+{% load static %}
+
+{% block title %}팀플 지원 시스템{% endblock %}
+
+{% block content %}
+    <!-- 메인 컨테이너 -->
+    <div class="container">
+        <!-- 공유 문서 섹션 -->
+        <div class="box">
+            <h3>📁 공유 문서</h3>
+            <ul>
+                <li>문서 1 (3 minutes ago)</li>
+                <li>문서 2 (1 hour ago)</li>
+                <li>문서 3 (2025.03.17)</li>
+                <li>문서 4 (2025.03.15)</li>
+            </ul>
+        </div>
+
+        <!-- 출결 확인 섹션 -->
+        <div class="box">
+            <h3>✅ 출결 확인</h3>
+            <!--Member 데이터와 연동해야 함-->
+            <label><input type="checkbox"> 변진영</label><br>
+            <label><input type="checkbox"> 박희민</label><br>
+            <label><input type="checkbox"> 신하진</label><br>
+        </div>
+
+        <!-- 장소 예약 섹션 -->
+        <div class="box">
+            <h3>📅 장소 예약</h3>
+            <a href="https://reserve.ssu.ac.kr/booking" target="_blank">
+                <button>더보기</button>
+            </a>
+        </div>
+
+        <!-- 팀 대화 섹션 -->
+        <div class="box">
+            <h3>💬 팀 대화</h3>
+            <!--Member 데이터와 연동해야 함-->
+            <div class="chat-box" id="chat-box">
+                <p><strong>팀원1:</strong> 안녕하세요!</p>
+                <p><strong>팀원2:</strong> 안녕하세요.</p>
+            </div>
+            <div class="input-area">
+                <input type="text" id="chat-input" placeholder="메시지를 입력하세요...">
+                <button onclick="sendMessage()">전송</button>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script src="{% static 'mainpage/js/main.js' %}"></script>
+{% endblock %}

@@ -1,0 +1,21 @@
+{% extends "mainpage/base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container">
+    <div class="box">
+        <h3>💬 팀 대화</h3>
+        <div class="chat-box" id="chat-box">
+            <!-- 메시지가 여기에 동적으로 추가됨 -->
+        </div>
+        <div class="input-area">
+            <input type="text" id="chat-input" placeholder="메시지를 입력하세요...">
+            <button id="send-chat">전송</button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'mainpage/js/main.js' %}"></script>
+{% endblock %}

@@ -1,0 +1,20 @@
+<!-- 공유 문서 페이지 -->
+
+{% extends "mainpage/base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container">
+    <div class="box">
+        <h3>📁 공유 문서</h3>
+        <ul id="document-list">
+            <!-- 문서 항목이 JS를 통해 여기에 삽입됩니다 -->
+        </ul>
+        <button id="load-documents">문서 불러오기</button>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'mainpage/js/main.js' %}"></script>
+{% endblock %}

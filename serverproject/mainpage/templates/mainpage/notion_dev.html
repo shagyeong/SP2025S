@@ -1,0 +1,23 @@
+<!-- Notion API 연동 테스트 -->
+ 
+{% load static %}
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Notion 연동</title>
+  <link rel="stylesheet" href="{% static 'mainpage/css/main.css' %}" />
+</head>
+<body>
+  {% include 'mainpage/nav.html' %}
+
+  <div class="container">
+    <h2>📘 Notion 연동 페이지</h2>
+    <p>Notion API를 통해 아래 영역에 데이터를 표시합니다.</p>
+    <div id="notion-content">Loading...</div>
+  </div>
+
+  <script src="{% static 'mainpage/js/notion.js' %}"></script>
+</body>
+</html>
