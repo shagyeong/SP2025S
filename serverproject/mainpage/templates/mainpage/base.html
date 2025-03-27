@@ -1,0 +1,24 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}팀플 지원 서비스{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'mainpage/css/main.css' %}">
+</head>
+<body>
+    <!-- 공통 상단 네비게이션 -->
+    {% include 'mainpage/nav.html' %}
+
+    <!-- 페이지별 내용 삽입 -->
+    <main class="container">
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <!-- 공통 JS 스크립트 -->
+    {% block scripts %}
+    {% endblock %}
+</body>
+</html>
