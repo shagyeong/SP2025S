@@ -20,7 +20,7 @@ DROP TABLE IF EXISTS `dept`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `dept`(
     `dept_id` varchar(3) NOT NULL,
-    `name` varchar(50) NOT NULL,
+    `dept_name` varchar(50) NOT NULL,
     PRIMARY KEY (`dept_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -47,7 +47,7 @@ CREATE TABLE `section`(
     `semester` varchar(1) NOT NULL,
     `class` varchar(6) NOT NULL,
     `dept_id` varchar(3) NOT NULL,
-    `name` varchar(50) NOT NULL,
+    `section_name` varchar(50) NOT NULL,
     PRIMARY KEY (`section_id`, `section_year`, `semester`, `class`),
     KEY `dept_id` (`dept_id`),
     CONSTRAINT `section_fk_1` FOREIGN KEY (`dept_id`)
@@ -79,7 +79,7 @@ DROP TABLE IF EXISTS `team`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `team`(
     `team_id` varchar(15) NOT NULL,
-    `name` varchar(20) DEFAULT NULL,
+    `team_name` varchar(20) DEFAULT NULL,
     `leader_id` varchar(6) DEFAULT NULL,
     `mate1_id` varchar(6) DEFAULT NULL,
     `mate2_id` varchar(6) DEFAULT NULL,
@@ -197,7 +197,7 @@ DROP TABLE IF EXISTS `student`;
 CREATE TABLE `student`(
     `student_id` varchar(6) NOT NULL,
     `dept_id` varchar(3) DEFAULT NULL,
-    `name` varchar(20) DEFAULT NULL,
+    `student_name` varchar(20) DEFAULT NULL,
     PRIMARY KEY (`student_id`),
     KEY `dept_id` (`dept_id`),
     CONSTRAINT `student_fk_1` FOREIGN KEY (`dept_id`)
@@ -244,7 +244,7 @@ DROP TABLE IF EXISTS `instructor`;
 CREATE TABLE `instructor`(
     `instructor_id` varchar(6) NOT NULL,
     `dept_id` varchar(3) DEFAULT NULL,
-    `name` varchar(20) DEFAULT NULL,
+    `instructor_name` varchar(20) DEFAULT NULL,
     PRIMARY KEY (`instructor_id`),
     KEY `dept_id` (`dept_id`),
     CONSTRAINT `instructor_fk_1` FOREIGN KEY (`dept_id`)
