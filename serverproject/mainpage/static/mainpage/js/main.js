@@ -1,32 +1,22 @@
+// 공통 이벤트 핸들러 및 대시보드 초기화, 채팅, 예약, 출결 데이터 관리
+
 document.addEventListener("DOMContentLoaded", function () {
-    console.log("메인 JS 로드 완료");
+    console.log("📦 JS Loaded");
 
-    // 공유 문서
-    const loadDocumentsBtn = document.getElementById("load-documents");
-    if (loadDocumentsBtn) {
-        loadDocumentsBtn.addEventListener("click", fetchDocuments);
-    }
+    const actions = {
+        "load-documents": fetchDocuments,
+        "load-attendance": fetchAttendance,
+        "send-chat": sendMessage,
+        "load-reservation": fetchReservations,
+        "sync-documents": syncDocuments,
+    };
 
-    // 출결 확인
-    const loadAttendanceBtn = document.getElementById("load-attendance");
-    if (loadAttendanceBtn) {
-        loadAttendanceBtn.addEventListener("click", fetchAttendance);
-    }
-
-    // 팀 대화
-    const sendChatBtn = document.getElementById("send-chat");
-    if (sendChatBtn) {
-        sendChatBtn.addEventListener("click", sendMessage);
-    }
-
-    // 장소 예약
-    const loadReservationBtn = document.getElementById("load-reservation");
-    if (loadReservationBtn) {
-        loadReservationBtn.addEventListener("click", fetchReservations);
-    }
+    Object.entries(actions).forEach(([id, handler]) => {
+        const btn = document.getElementById(id);
+        if (btn) btn.addEventListener("click", handler);
+    });
 });
 
-// 공유 문서 API 호출
 function fetchDocuments() {
     fetch("/api/documents/")
         .then(res => res.json())
@@ -40,10 +30,9 @@ function fetchDocuments() {
                 list.appendChild(li);
             });
         })
-        .catch(err => console.error("공유 문서 오류:", err));
+        .catch(err => console.error("문서 로드 실패:", err));
 }
 
-// 출결 확인 API 호출
 function fetchAttendance() {
     fetch("/api/attendance/")
         .then(res => res.json())
@@ -57,31 +46,27 @@ function fetchAttendance() {
                 list.appendChild(li);
             });
         })
-        .catch(err => console.error("출결 오류:", err));
+        .catch(err => console.error("출결 로드 실패:", err));
 }
 
-// 채팅 메시지 전송
 function sendMessage() {
     const chatInput = document.getElementById("chat-input");
     const message = chatInput?.value.trim();
-
     if (!message) return;
 
-    // 서버로 메시지 전송
     fetch("/api/chat/send/", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message })
     })
     .then(res => res.json())
-    .then(data => {
+    .then(() => {
         chatInput.value = "";
         fetchChatMessages();
     })
-    .catch(err => console.error("채팅 전송 실패:", err));
+    .catch(err => console.error("메시지 전송 실패:", err));
 }
 
-// 채팅 메시지 최신화
 function fetchChatMessages() {
     fetch("/api/chat/")
         .then(res => res.json())
@@ -98,7 +83,6 @@ function fetchChatMessages() {
         .catch(err => console.error("채팅 불러오기 실패:", err));
 }
 
-// 장소 예약 조회
 function fetchReservations() {
     fetch("/api/reservations/")
         .then(res => res.json())
@@ -113,4 +97,18 @@ function fetchReservations() {
             });
         })
         .catch(err => console.error("예약 불러오기 실패:", err));
+}
+
+function syncDocuments() {
+    fetch("/notion/sync/")
+        .then(res => res.json())
+        .then(data => {
+            alert("✅ 문서 상태가 최신으로 동기화되었습니다!");
+            console.log(data.synced_documents);
+            location.reload();
+        })
+        .catch(err => {
+            alert("❌ 동기화 실패");
+            console.error(err);
+        });
 }

@@ -1,56 +1,41 @@
-<!-- 메인 페이지-->
-{% extends "mainpage/base.html" %}
+{% extends 'mainpage/base.html' %}
 {% load static %}
 
-{% block title %}팀플 지원 시스템{% endblock %}
+{% block title %}학생 대시보드{% endblock %}
 
 {% block content %}
-    <!-- 메인 컨테이너 -->
-    <div class="container">
-        <!-- 공유 문서 섹션 -->
-        <div class="box">
-            <h3>📁 공유 문서</h3>
-            <ul>
-                <li>문서 1 (3 minutes ago)</li>
-                <li>문서 2 (1 hour ago)</li>
-                <li>문서 3 (2025.03.17)</li>
-                <li>문서 4 (2025.03.15)</li>
-            </ul>
-        </div>
+<div class="container">
+  <h2>🎓 팀 선택</h2>
+  <div class="team-button-list" id="team-buttons">
+    <!-- 버튼들이 JS로 렌더링됨 -->
+    <button class="team-button" data-team-id="teamA">A팀</button>
+    <button class="team-button" data-team-id="teamB">B팀</button>
+  </div>
+  </div>
 
-        <!-- 출결 확인 섹션 -->
-        <div class="box">
-            <h3>✅ 출결 확인</h3>
-            <!--Member 데이터와 연동해야 함-->
-            <label><input type="checkbox"> 변진영</label><br>
-            <label><input type="checkbox"> 박희민</label><br>
-            <label><input type="checkbox"> 신하진</label><br>
-        </div>
+  <div class="box" id="team-info">
+    <h3 id="team-name">👥 팀 정보</h3>
+    <div id="team-members"></div>
+  </div>
 
-        <!-- 장소 예약 섹션 -->
-        <div class="box">
-            <h3>📅 장소 예약</h3>
-            <a href="https://reserve.ssu.ac.kr/booking" target="_blank">
-                <button>더보기</button>
-            </a>
-        </div>
+  <div class="box">
+    <h3><span class="icon">📁</span> 공유 문서</h3>
+    <ul id="team-documents" class="notion-style-list"></ul>
+    <a href="{% url 'mainpage:documents' %}" class="btn-link">전체 문서 보기</a>
+  </div>
 
-        <!-- 팀 대화 섹션 -->
-        <div class="box">
-            <h3>💬 팀 대화</h3>
-            <!--Member 데이터와 연동해야 함-->
-            <div class="chat-box" id="chat-box">
-                <p><strong>팀원1:</strong> 안녕하세요!</p>
-                <p><strong>팀원2:</strong> 안녕하세요.</p>
-            </div>
-            <div class="input-area">
-                <input type="text" id="chat-input" placeholder="메시지를 입력하세요...">
-                <button onclick="sendMessage()">전송</button>
-            </div>
-        </div>
-    </div>
+  <div class="box">
+    <h3><span class="icon">✅</span> 출결 현황</h3>
+    <table class="attendance-table">
+      <thead><tr><th>이름</th><th>출결</th></tr></thead>
+      <tbody id="team-attendance"></tbody>
+    </table>
+    <a href="{% url 'attendance:attendance' %}" class="btn-link">전체 출결 보기</a>
+  </div>
+</div>
 {% endblock %}
 
 {% block scripts %}
-    <script src="{% static 'mainpage/js/main.js' %}"></script>
+<script src="{% static 'mainpage/js/student.js' %}"></script>
 {% endblock %}
+
