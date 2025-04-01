@@ -1,57 +1,64 @@
-/* 교수자 전용 UI (팀 생성, 수정, 출결표, 메뉴 등) */
 
 :root {
     --background-light: #f9f9ff;
     --background-card: #fcfcfc;
-  }
-  
-  .instructor-page {
+}
+
+.instructor-page {
     max-width: 800px;
     margin: auto;
     padding: 40px;
-  }
-  
-  .create-team, .team-list-section {
+}
+
+.create-team, .team-list-section {
+    border: 1px solid #ccc;
+    background: #ffffff;
+    padding: 24px;
+    border-radius: 14px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
     margin-bottom: 40px;
-    padding: 20px;
-    background: var(--background-light);
-    border: 1px solid #ddd;
-    border-radius: 10px;
-  }
-  
-  .team-table {
+}
+
+#create-edit-form {
+    background: #ffffff;
+    padding: 24px;
+    border-radius: 14px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+    margin-top: 1.5rem;
+}
+
+#create-edit-form label {
+    display: block;
+    margin-bottom: 10px;
+    font-weight: 500;
+}
+
+.team-table {
     width: 100%;
     border-collapse: collapse;
     margin-top: 1rem;
-  }
-  .team-table th, .team-table td {
+}
+.team-table th, .team-table td {
     padding: 12px;
     border-bottom: 1px solid #ddd;
-  }
-  .team-table th {
+}
+.team-table th {
     background-color: #f8f9fa;
     font-weight: bold;
     text-align: left;
-  }
-  
-  .team-card {
-    box-shadow: 0 0 4px rgba(0,0,0,0.05);
-    padding: 12px;
-    border-radius: 8px;
-    margin-bottom: 10px;
-  }
-  
-  .menu-wrapper {
+}
+
+.menu-wrapper {
     position: relative;
     display: inline-block;
-  }
-  .menu-btn {
+}
+.menu-btn {
     background: none;
     border: none;
     font-size: 18px;
     cursor: pointer;
-  }
-  .menu-dropdown {
+}
+.menu-dropdown {
     position: absolute;
     right: 0;
     top: 24px;
@@ -60,8 +67,8 @@
     box-shadow: 0px 2px 5px rgba(0,0,0,0.1);
     z-index: 10;
     padding: 4px 0;
-  }
-  .menu-dropdown button {
+}
+.menu-dropdown button {
     display: block;
     width: 100%;
     background: none;
@@ -69,26 +76,12 @@
     padding: 8px 16px;
     text-align: left;
     cursor: pointer;
-  }
-  .menu-dropdown button:hover {
+}
+.menu-dropdown button:hover {
     background-color: #e0e0e0;
-  }
-  
-  #create-edit-form {
-    background-color: #fafafa;
-    border: 1px solid #ddd;
-    padding: 20px;
-    margin-top: 1.5rem;
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-  }
-  #create-edit-form label {
-    display: block;
-    margin-bottom: 10px;
-    font-weight: 500;
-  }
-  
-  #student-list label {
+}
+
+#student-list label {
     display: inline-block;
     width: 200px;
     margin: 6px;
@@ -98,49 +91,49 @@
     background: #fff;
     cursor: pointer;
     transition: background-color 0.2s;
-  }
-  #student-list label:hover {
+}
+#student-list label:hover {
     background-color: #f1f3f5;
-  }
-  
-  .attendance-table {
+}
+
+.attendance-table {
     width: 100%;
     border-collapse: collapse;
     margin-top: 20px;
-  }
-  .attendance-table th, .attendance-table td {
+}
+.attendance-table th, .attendance-table td {
     border: 1px solid #ddd;
     padding: 10px;
     text-align: center;
-  }
-  .attendance-table th {
+}
+.attendance-table th {
     background-color: #f5f5f5;
     font-weight: bold;
-  }
-  
-  .attendance-dot {
+}
+
+.attendance-dot {
     display: inline-block;
     width: 12px;
     height: 12px;
     border-radius: 50%;
     margin-right: 6px;
-  }
-  .status-present { background-color: #3adb76; }
-  .status-absent { background-color: #ec5840; }
-  
-  .team-border-top td:first-child {
+}
+.status-present { background-color: #3adb76; }
+.status-absent { background-color: #ec5840; }
+
+.team-border-top td:first-child {
     font-weight: bold;
     border-top: 2px solid #ccc;
-  }
-  .team-name {
+}
+.team-name {
     font-weight: bold;
     background-color: var(--background-card);
-  }
-  
-  .team-table tbody tr:hover {
+}
+
+.team-table tbody tr:hover {
     background-color: #f9f9f9;
-  }
-  td.team-leader {
+}
+td.team-leader {
     font-weight: bold;
     color: #2c3e50;
-  }
+}
