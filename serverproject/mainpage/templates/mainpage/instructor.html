@@ -1,0 +1,78 @@
+{% extends 'mainpage/base_instructor.html' %}
+{% load static %}
+
+{% block title %}팀플 헬퍼{% endblock %}
+
+{% block content %}
+<div class="instructor-page">
+    <h1>👨‍🏫 교수자 모드</h1>
+
+    <!-- 팀 목록 표시 -->
+    <section class="team-list-section">
+        <h2>팀 명단</h2>
+        <input type="text" id="search-team" placeholder="🔍 팀 이름 또는 팀장 검색..." />
+        <button onclick="openCreateForm()">+ 팀 생성</button>
+        <table class="team-table">
+            <thead>
+                <tr>
+                    <th>팀 이름</th>
+                    <th>명단</th>
+                    <th>팀장</th>
+                    <th>관리</th>
+                </tr>
+            </thead>
+            <tbody id="team-table-body">
+                <!-- JS 로 자동 레네더링 -->
+            </tbody>
+        </table>
+    </section>
+
+    <!-- 팀 생성 / 수정 형태를 가지는 형태로 -->
+    <section class="create-team" id="create-edit-form" style="display:none;">
+        <h2 id="form-title">➕ 팀 생성</h2>
+        <form id="create-team-form">
+            <label>팀 이름: <input type="text" id="team_name" required></label><br><br>
+
+            <div>
+                <h4>👥 팀원 선택:</h4>
+                <div id="student-list"></div>
+            </div><br>
+
+            <div>
+                <label>👑 팀장 선택:
+                    <select id="leader_id" required></select>
+                </label>
+            </div><br>
+
+            <button type="submit" id="submit-btn">팀 생성</button>
+            <button type="button" onclick="closeForm()">취소</button>
+        </form>
+        <div id="create-result"></div>
+    </section>
+
+    <!-- 출결 조회 영역 -->
+    <section class="attendance-section">
+        <h2>출결 조회</h2>
+    
+        <label>회차 선택:
+            <select id="attendance-round">
+                {% for i in rounds %}
+                    <option value="{{ i }}">{{ i }}회차</option>
+                {% endfor %}
+            </select>
+        </label>
+        <button id="load-attendance">출결 조회</button>
+    
+        <div id="attendance-result" style="margin-top:20px;"></div>
+    </section>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'mainpage/css/instructor.css' %}">
+{% endblock %}
+
+{% block extra_js %}
+
+<script src="{% static 'mainpage/js/instructor.js' %}"></script>
+{% endblock %}
