@@ -1,0 +1,45 @@
+{% extends 'mainpage/base_instructor.html' %}
+{% load static %}
+
+{% block title %}출결 상세 - 팀명: {{ team.name }}{% endblock %}
+
+{% block content %}
+<div class="attendance-detail-page">
+    <h1>📋 {{ team.name }} 출결 상세</h1>
+
+    <h2>출결 현황</h2>
+    <table class="attendance-table">
+        <thead>
+            <tr>
+                <th>이름</th>
+                <th>출석 상태</th>
+                <th>출결 시간</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for record in attendance %}
+            <tr>
+                <td>{{ record.student_name }}</td>
+                <td>
+                    <span class="dot {% if record.status == '출석' %}green{% else %}red{% endif %}"></span> 
+                    {{ record.status }}
+                </td>
+                <td>{{ record.timestamp }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="3">출결 데이터가 없습니다.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <button onclick="goBack()">돌아가기</button>
+</div>
+
+<script>
+function goBack() {
+    window.history.back();
+}
+</script>
+{% endblock %}

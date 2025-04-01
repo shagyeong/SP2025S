@@ -1,0 +1,36 @@
+{% extends 'mainpage/base_instructor.html' %}
+{% load static %}
+
+{% block title %}교수자 출결 확인{% endblock %}
+
+{% block content %}
+<div class="instructor-page">
+    <h1>👨‍🏫 교수자 출결 관리</h1>
+
+    <section class="team-list-section">
+        <h2>팀 명단</h2>
+        <table class="team-table">
+            <thead>
+                <tr>
+                    <th>팀 이름</th>
+                    <th>팀장</th>
+                    <th>출결 확인</th>
+                </tr>
+            </thead>
+            <tbody id="team-table-body">
+                {% for team in teams %}
+                <tr>
+                    <td>{{ team.name }}</td>
+                    <td>{{ team.leader }}</td>
+                    <td>
+                        <a href="{% url 'attendance:team_attendance' team_id=team.id %}">출결 보기</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="3">팀이 없습니다.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </section>
+</div>
+{% endblock %}
