@@ -1,0 +1,64 @@
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px 20px;
+}
+
+h2 {
+  font-size: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+h3::before {
+    margin-right: 6px;
+    font-size: 1.1rem;
+  }
+
+.team-button-list {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 2rem;
+}
+
+.team-button {
+  padding: 10px 18px;
+  border: 1px solid #ccc;
+  background: #f9f9f9;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.team-button:hover,
+.team-button.active {
+  background-color: #007bff;
+  color: white;
+  border-color: #007bff;
+}
+
+.box {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  margin-bottom: 1rem;
+}
+
+.btn-link {
+    display: inline-block;
+    margin-top: 0.6rem;
+    padding: 8px 16px;
+    border-radius: 8px;
+    background-color: #f0f4ff;
+    color: #6a6a6a;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.btn-link:hover {
+    background-color: #3b6bff;
+    color: #fff;
+}
