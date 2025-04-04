@@ -5,6 +5,7 @@
 #   * Make sure each ForeignKey and OneToOneField has `on_delete` set to the desired behavior
 #   * Remove `managed = False` lines if you wish to allow Django to create, modify, and delete the table
 # Feel free to rename the models, but don't rename db_table values or field names.
+import uuid
 from django.db import models
 
 
@@ -205,7 +206,7 @@ class Teaches(models.Model):
 class Team(models.Model):
     team_id = models.CharField(primary_key=True, max_length=15)
     team_name = models.CharField(max_length=20, blank=True, null=True)
-    leader = models.ForeignKey(Student, models.DO_NOTHING, blank=True, null=True)
+    leader_id = models.ForeignKey(Student, models.DO_NOTHING, blank=True, null=True)
     mate1_id = models.CharField(max_length=6, blank=True, null=True)
     mate2_id = models.CharField(max_length=6, blank=True, null=True)
     mate3_id = models.CharField(max_length=6, blank=True, null=True)
@@ -214,3 +215,4 @@ class Team(models.Model):
     class Meta:
         managed = False
         db_table = 'team'
+

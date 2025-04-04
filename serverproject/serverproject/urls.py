@@ -29,4 +29,5 @@ urlpatterns = [
     path('chat/', include('chat.urls', namespace='chat')),
     path('reservation/', include('reservation.urls', namespace='reservation')),
     path('team/', include('team.urls', namespace='team')),
+    #path('team/api/', include('team.urls')),
 ]
