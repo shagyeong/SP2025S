@@ -61,5 +61,10 @@ class TeamDetailView(APIView):
         team.delete()
         return Response({"status": "success", "message": "팀이 삭제되었습니다."}, status=status.HTTP_204_NO_CONTENT)
 
+class TeamListView(APIView):
+    def get(self, request):
+        teams = Team.objects.all()
+        serializer = TeamSerializer(teams, many=True)
+        return Response(serializer.data)
 def team_view(request):
     return render(request, 'team/team.html')
