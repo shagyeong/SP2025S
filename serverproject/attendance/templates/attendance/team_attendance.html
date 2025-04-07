@@ -1,45 +1,88 @@
 {% extends 'mainpage/base_instructor.html' %}
 {% load static %}
 
-{% block title %}출결 상세 - 팀명: {{ team.name }}{% endblock %}
+{% block title %}출결 상세{% endblock %}
 
 {% block content %}
 <div class="attendance-detail-page">
-    <h1>📋 {{ team.name }} 출결 상세</h1>
+    <h1>📋 출결 상세</h1>
 
-    <h2>출결 현황</h2>
-    <table class="attendance-table">
+    <div>
+        <label for="team-select">팀 ID: </label>
+        <input type="text" id="team-id" placeholder="예: 01-001SP2025S-1">
+        <label for="round-select">회차: </label>
+        <select id="round-select">
+            {% for i in "01,02,03,04,05,06,07,08,09,10".split(",") %}
+            <option value="{{ i }}">{{ i }}회차</option>
+            {% endfor %}
+        </select>
+        <button id="load-team-attendance">조회</button>
+    </div>
+
+    <table class="attendance-table" style="margin-top: 20px;">
         <thead>
             <tr>
-                <th>이름</th>
-                <th>출석 상태</th>
-                <th>출결 시간</th>
+                <th>역할</th>
+                <th>학번</th>
+                <th>출결</th>
             </tr>
         </thead>
-        <tbody>
-            {% for record in attendance %}
-            <tr>
-                <td>{{ record.student_name }}</td>
-                <td>
-                    <span class="dot {% if record.status == '출석' %}green{% else %}red{% endif %}"></span> 
-                    {{ record.status }}
-                </td>
-                <td>{{ record.timestamp }}</td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="3">출결 데이터가 없습니다.</td>
-            </tr>
-            {% endfor %}
+        <tbody id="attendance-body">
+            <!-- JS로 렌더링 -->
         </tbody>
     </table>
 
-    <button onclick="goBack()">돌아가기</button>
+    <button onclick="goBack()" style="margin-top: 20px;">← 돌아가기</button>
 </div>
+{% endblock %}
 
+{% block extra_js %}
 <script>
 function goBack() {
     window.history.back();
 }
+
+document.addEventListener("DOMContentLoaded", () => {
+    document.getElementById("load-team-attendance").addEventListener("click", () => {
+        const teamId = document.getElementById("team-id").value.trim();
+        const round = document.getElementById("round-select").value;
+
+        if (!teamId || !round) {
+            alert("팀 ID와 회차를 모두 입력하세요.");
+            return;
+        }
+
+        fetch(`/attendance/${teamId}/${round}/`)
+            .then(res => res.json())
+            .then(data => {
+                const tableBody = document.getElementById("attendance-body");
+                tableBody.innerHTML = "";
+
+                const fields = {
+                    at_leader: "팀장",
+                    at_mate1: "팀원1",
+                    at_mate2: "팀원2",
+                    at_mate3: "팀원3",
+                    at_mate4: "팀원4"
+                };
+
+                Object.entries(fields).forEach(([key, label]) => {
+                    const status = data[key] === "o" ? "✅ 출석" : "❌ 결석";
+                    const studentId = data.team?.[key.replace("at_", "") + "_id"] || "-";
+                    const row = document.createElement("tr");
+                    row.innerHTML = `
+                        <td>${label}</td>
+                        <td>${studentId}</td>
+                        <td>${status}</td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            })
+            .catch(err => {
+                alert("출결 데이터를 불러오는 데 실패했습니다.");
+                console.error(err);
+            });
+    });
+});
 </script>
 {% endblock %}

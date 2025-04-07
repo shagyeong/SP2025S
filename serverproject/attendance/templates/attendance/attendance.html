@@ -9,7 +9,11 @@
         <div class="attendance-today">
             <h3>오늘</h3>
             <div id="attendance-checklist">
-                <!-- 팀원 출석 체크박스가 여기에 추가됨 -->
+                <label><input type="checkbox" data-role="leader"> 팀장</label><br>
+                <label><input type="checkbox" data-role="mate1"> 팀원 1</label><br>
+                <label><input type="checkbox" data-role="mate2"> 팀원 2</label><br>
+                <label><input type="checkbox" data-role="mate3"> 팀원 3</label><br>
+                <label><input type="checkbox" data-role="mate4"> 팀원 4</label><br>
             </div>
             <button id="submit-attendance">출석 완료</button>
             <p id="attendance-timestamp">타임스탬프: -</p>
@@ -23,9 +27,9 @@
         <table>
             <thead>
                 <tr>
-                    <th>이름</th>
-                    <th>출석 상태</th>
-                    <th>출결 시간</th>
+                    <th>회차</th>
+                    <th>역할</th>
+                    <th>출결</th>
                 </tr>
             </thead>
             <tbody id="history-list">
@@ -37,6 +41,6 @@
 {% endblock %}
 
 {% block scripts %}
-<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>  <!-- 캘린더 라이브러리 -->
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script src="{% static 'attendance/js/attendance.js' %}" defer></script>
 {% endblock %}

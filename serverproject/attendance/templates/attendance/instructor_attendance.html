@@ -18,19 +18,39 @@
                 </tr>
             </thead>
             <tbody id="team-table-body">
-                {% for team in teams %}
-                <tr>
-                    <td>{{ team.name }}</td>
-                    <td>{{ team.leader }}</td>
-                    <td>
-                        <a href="{% url 'attendance:team_attendance' team_id=team.id %}">출결 보기</a>
-                    </td>
-                </tr>
-                {% empty %}
-                <tr><td colspan="3">팀이 없습니다.</td></tr>
-                {% endfor %}
+                <!-- JS로 동적 렌더링 -->
             </tbody>
         </table>
     </section>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    fetch("/team/team_list/")
+        .then(res => res.json())
+        .then(data => {
+            const tbody = document.getElementById("team-table-body");
+            tbody.innerHTML = "";
+
+            data.forEach(team => {
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td>${team.team_name}</td>
+                    <td>${team.leader_id}</td>
+                    <td>
+                        <a class="btn" href="/attendance/${team.team_id}/">출결 보기</a>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        })
+        .catch(error => {
+            console.error("팀 목록 조회 실패:", error);
+            const tbody = document.getElementById("team-table-body");
+            tbody.innerHTML = `<tr><td colspan="3">❌ 팀 정보를 불러오는 데 실패했습니다.</td></tr>`;
+        });
+});
+</script>
 {% endblock %}

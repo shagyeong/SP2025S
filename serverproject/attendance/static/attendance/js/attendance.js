@@ -1,100 +1,134 @@
-// 출결 관리 기능
-
-document.getElementById("load-attendance").addEventListener("click", function () {
-    fetch("http://127.0.0.1:8000/api/attendance/")  // Django API 호출
-        .then(response => response.json())
-        .then(data => {
-            const attendanceList = document.getElementById("attendance-list");
-            attendanceList.innerHTML = "";  // 기존 목록 초기화
-            data.attendance.forEach(record => {
-                const li = document.createElement("li");
-                li.textContent = `팀: ${record.team__name}, 회차: ${record.round}, 출석 상태: ${record.attendance}`;
-                attendanceList.appendChild(li);
-            });
-        })
-        .catch(error => console.error("오류 발생:", error));
-});
-
 document.addEventListener("DOMContentLoaded", function () {
-    console.log("출결 확인 페이지 로드됨");
+    const teamId = document.body.dataset.teamId; // HTML <body data-team-id="...">
+    console.log("✅ 출결 페이지 로드됨: ", teamId);
 
-    // 출석 체크 리스트 불러오기
-    fetchAttendanceList();
+    // 출석 정보 불러오기
+    document.getElementById("submit-attendance").addEventListener("click", () => {
+        const round = prompt("출결 회차를 입력하세요 (예: 01)");
+        if (!round) return;
 
-    // 출석 완료 버튼 클릭 이벤트
-    document.getElementById("submit-attendance").addEventListener("click", submitAttendance);
+        const checkboxes = document.querySelectorAll("#attendance-checklist input");
+        const attendance = {
+            team_id: teamId,
+            round: round,
+            at_leader: checkboxes[0].checked ? 'o' : 'x',
+            at_mate1: checkboxes[1].checked ? 'o' : 'x',
+            at_mate2: checkboxes[2].checked ? 'o' : 'x',
+            at_mate3: checkboxes[3].checked ? 'o' : 'x',
+            at_mate4: checkboxes[4]?.checked ? 'o' : 'x'
+        };
 
-    // 캘린더 설정 (Flatpickr 적용)
+        fetch("/attendance/attendance/", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(attendance)
+        })
+        .then(res => res.json())
+        .then(data => {
+            alert("✅ 출석이 등록되었습니다.");
+            document.getElementById("attendance-timestamp").textContent = "타임스탬프: " + new Date().toLocaleString();
+        })
+        .catch(err => console.error("출석 등록 실패:", err));
+    });
+
+    // 회차별 출결 조회
     flatpickr("#calendar", {
         dateFormat: "Y-m-d",
-        onChange: function(selectedDates, dateStr) {
-            fetchAttendanceHistory(dateStr);
+        onChange: function (_, dateStr) {
+            const round = prompt(`${dateStr}에 해당하는 회차 번호를 입력하세요`);
+            if (!round) return;
+
+            fetch(`/attendance/attendance/${teamId}/${round}/`)
+                .then(res => res.json())
+                .then(data => {
+                    const list = document.getElementById("history-list");
+                    list.innerHTML = `
+                        <tr><td>팀장</td><td>${data.at_leader}</td><td>${round}회차</td></tr>
+                        <tr><td>팀원1</td><td>${data.at_mate1}</td><td>${round}회차</td></tr>
+                        <tr><td>팀원2</td><td>${data.at_mate2}</td><td>${round}회차</td></tr>
+                        <tr><td>팀원3</td><td>${data.at_mate3}</td><td>${round}회차</td></tr>
+                        <tr><td>팀원4</td><td>${data.at_mate4}</td><td>${round}회차</td></tr>
+                    `;
+                });
         }
     });
 });
 
-// 1. 오늘의 출결 리스트 가져오기
-function fetchAttendanceList() {
-    fetch("http://127.0.0.1:8000/api/attendance/today/")
-        .then(response => response.json())
+
+// 출석 리스트
+function fetchAttendanceList(teamId) {
+    fetch(`/attendance/${teamId}/`)
+        .then(res => res.json())
         .then(data => {
             const checklist = document.getElementById("attendance-checklist");
-            checklist.innerHTML = "";  // 기존 목록 초기화
+            checklist.innerHTML = "";
 
-            data.attendance.forEach(record => {
+            data.forEach(record => {
                 const label = document.createElement("label");
                 label.innerHTML = `
-                    <input type="checkbox" data-id="${record.id}" ${record.status === "출석" ? "checked" : ""}>
-                    ${record.student_name}
+                    회차 ${record.round}
+                    <input type="checkbox" data-round="${record.round}" ${record.attendance === "출석" ? "checked" : ""}>
                 `;
                 checklist.appendChild(label);
             });
         })
-        .catch(error => console.error("출석 체크 리스트 불러오기 실패:", error));
+        .catch(error => console.error("출석 목록 불러오기 실패:", error));
 }
 
-// 2. 출석 완료 (타임스탬프 기록)
-function submitAttendance() {
-    const checkboxes = document.querySelectorAll("#attendance-checklist input");
-    const attendanceData = [];
+// 출석 제출
+function submitAttendance(teamId, round) {
+    const checkboxes = document.querySelectorAll("#attendance-checklist input[type='checkbox']");
+    const attendanceData = {};
 
-    checkboxes.forEach(checkbox => {
-        attendanceData.push({
-            student_id: checkbox.getAttribute("data-id"),
-            status: checkbox.checked ? "출석" : "결석"
-        });
+    checkboxes.forEach(cb => {
+        const role = cb.dataset.role;
+        attendanceData[`at_${role}`] = cb.checked ? 'o' : 'x';
     });
 
-    fetch("http://127.0.0.1:8000/api/attendance/update/", {
+    attendanceData.team_id = teamId;
+    attendanceData.round = round;
+
+    fetch("/attendance/attendance/", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ attendance: attendanceData })
+        body: JSON.stringify(attendanceData)
     })
-    .then(response => response.json())
+    .then(res => res.json())
     .then(data => {
         document.getElementById("attendance-timestamp").textContent = "타임스탬프: " + new Date().toLocaleString();
-        alert("출석이 기록되었습니다!");
+        alert("✅ 출석이 기록되었습니다!");
     })
-    .catch(error => console.error("출석 기록 실패:", error));
+    .catch(err => console.error("출석 등록 실패:", err));
 }
 
-// 3. 특정 날짜 출결 기록 가져오기
-function fetchAttendanceHistory(date) {
-    fetch(`http://127.0.0.1:8000/api/attendance/history/?date=${date}`)
-        .then(response => response.json())
-        .then(data => {
-            const historyList = document.getElementById("history-list");
-            historyList.innerHTML = "";  // 기존 목록 초기화
 
-            data.attendance.forEach(record => {
-                const row = document.createElement("tr");
-                row.innerHTML = `
-                    <td>${record.student_name}</td>
-                    <td>${record.status}</td>
-                    <td>${record.timestamp}</td>
-                `;
-                historyList.appendChild(row);
+// 회차별 히스토리
+function fetchAttendanceHistory(teamId, round) {
+    fetch(`/attendance/attendance/${teamId}/${round}/`)
+        .then(res => res.json())
+        .then(data => {
+            const tbody = document.getElementById("history-list");
+            tbody.innerHTML = "";
+
+            const statusIcons = {
+                o: '<span class="dot green"></span> 출석',
+                x: '<span class="dot red"></span> 결석',
+                null: ' - '
+            };
+
+            const rows = [
+                { name: "팀장", status: data.at_leader },
+                { name: "팀원1", status: data.at_mate1 },
+                { name: "팀원2", status: data.at_mate2 },
+                { name: "팀원3", status: data.at_mate3 },
+                { name: "팀원4", status: data.at_mate4 }
+            ];
+
+            rows.forEach(row => {
+                const tr = document.createElement("tr");
+                tr.innerHTML = `<td>${row.name}</td><td>${statusIcons[row.status] || '-'}</td><td>${round}회차</td>`;
+                tbody.appendChild(tr);
             });
         })
-        .catch(error => console.error("출석 기록 조회 실패:", error));
+        .catch(err => console.error("회차별 출결 조회 실패:", err));
 }
