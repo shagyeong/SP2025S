@@ -42,7 +42,7 @@ INSTALLED_APPS = [
     'reservation',
     'attendance',
     'chat',
-    'instructor'.
+    'instructor',
 ]
 
 MIDDLEWARE = [
