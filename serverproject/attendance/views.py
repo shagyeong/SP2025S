@@ -25,11 +25,22 @@ class AttendanceByTeamView(APIView):
         return Response(serializer.data)
 
 class AttendanceByRoundView(APIView):
-    """GET /attendance/{team_id}/{round}  (특정 팀과 회차의 출결 조회)"""
+    """GET /attendance/{team_id}/{round} 조회 & PUT 수정"""
+    
     def get(self, request, team_id, round):
-        attendance_record = get_object_or_404(Attendance, team_id=team_id, round=round)
-        serializer = AttendanceSerializer(attendance_record)
+        attendance = get_object_or_404(Attendance, team_id=team_id, round=round)
+        serializer = AttendanceSerializer(attendance)
         return Response(serializer.data)
+
+    def put(self, request, team_id, round):
+        attendance = get_object_or_404(Attendance, team_id=team_id, round=round)
+        serializer = AttendanceSerializer(attendance, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
 
 def attendance_view(request):
     return render(request, 'attendance/attendance.html')

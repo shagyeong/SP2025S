@@ -191,7 +191,7 @@ class Takes(models.Model):
 
 
 class Teaches(models.Model):
-    instructor = models.OneToOneField(Instructor, models.DO_NOTHING, primary_key=True)  # The composite primary key (instructor_id, section_id, section_year, semester, class) found, that is not supported. The first column is selected.
+    instructor = models.OneToOneField(Instructor, models.DO_NOTHING)  # The composite primary key (instructor_id, section_id, section_year, semester, class) found, that is not supported. The first column is selected.
     section = models.ForeignKey(Section, models.DO_NOTHING)
     section_year = models.ForeignKey(Section, models.DO_NOTHING, db_column='section_year', to_field='section_year', related_name='teaches_section_year_set')
     semester = models.ForeignKey(Section, models.DO_NOTHING, db_column='semester', to_field='semester', related_name='teaches_semester_set')
