@@ -4,8 +4,8 @@
 <head>
   <meta charset="UTF-8">
   <title>{% block title %}교수자 페이지{% endblock %}</title>
-  <link rel="stylesheet" href="{% static 'mainpage/css/main.css' %}">
-  <link rel="stylesheet" href="{% static 'mainpage/css/instructor.css' %}">
+  <link rel="stylesheet" href="{% static 'mainpage\static\mainpage\css\main.css' %}">
+  <link rel="stylesheet" href="{% static 'instructor\instructor.css' %}">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/variable/pretendardvariable.css" />
 
     <style>
@@ -16,7 +16,7 @@
   {% block extra_css %}{% endblock %}
 </head>
 <body>
-  {% include 'mainpage/nav_instructor.html' %}
+  {% include 'instructor/nav_instructor.html' %}
 
   <main class="container">
     {% block content %}{% endblock %}

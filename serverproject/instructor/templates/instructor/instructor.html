@@ -1,4 +1,4 @@
-{% extends 'mainpage/base_instructor.html' %}
+{% extends 'instructor/base_instructor.html' %}
 {% load static %}
 
 {% block title %}팀플 헬퍼{% endblock %}
@@ -69,10 +69,10 @@
 {% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'mainpage/css/instructor.css' %}">
+<link rel="stylesheet" href="{% static 'instructor\css\instructor.css' %}">
 {% endblock %}
 
 {% block extra_js %}
 
-<script src="{% static 'mainpage/js/instructor.js' %}"></script>
+<script src="{% static 'instructor/js/instructor.js' %}"></script>
 {% endblock %}
