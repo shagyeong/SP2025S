@@ -1,3 +1,6 @@
+<!-- 교수자용 출결 상세 확인 페이지 -->
+
+
 {% extends 'instructor/base_instructor.html' %}
 {% load static %}
 
@@ -12,10 +15,10 @@
         <input type="text" id="team-id" placeholder="예: 01-001SP2025S-1">
         <label for="round-select">회차: </label>
         <select id="round-select">
-            {% for i in "01,02,03,04,05,06,07,08,09,10".split(",") %}
-            <option value="{{ i }}">{{ i }}회차</option>
+            {% for i in rounds %}
+              <option value="{{ i }}">{{ i }}회차</option>
             {% endfor %}
-        </select>
+          </select>
         <button id="load-team-attendance">조회</button>
     </div>
 
@@ -42,15 +45,23 @@ function goBack() {
     window.history.back();
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-    document.getElementById("load-team-attendance").addEventListener("click", () => {
-        const teamId = document.getElementById("team-id").value.trim();
-        const round = document.getElementById("round-select").value;
+// URL에서 쿼리스트링 파라미터 가져오기 함수
+function getQueryParam(param) {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get(param);
+}
 
-        if (!teamId || !round) {
-            alert("팀 ID와 회차를 모두 입력하세요.");
-            return;
-        }
+document.addEventListener("DOMContentLoaded", () => {
+    // ✅ URL 쿼리스트링에서 team_id 가져오기
+    const params = new URLSearchParams(window.location.search);
+    const teamId = params.get("team_id");
+
+    if (teamId) {
+        document.getElementById("team-id").value = teamId;
+    }
+
+    document.getElementById("load-team-attendance").addEventListener("click", () => {
+        const round = document.getElementById("round-select").value;
 
         fetch(`/attendance/${teamId}/${round}/`)
             .then(res => res.json())
@@ -84,5 +95,7 @@ document.addEventListener("DOMContentLoaded", () => {
             });
     });
 });
+
 </script>
 {% endblock %}
+

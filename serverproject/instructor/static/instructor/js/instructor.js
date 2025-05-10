@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', function () {
     let editMode = false;
     let editingTeamId = null;
 
-    // ✅ 1. 학생 목록 가져오기
+    // 1. 학생 목록 가져오기
     fetch('/api/students')
         .then(res => res.json())
         .then(data => {
@@ -22,9 +22,11 @@ document.addEventListener('DOMContentLoaded', function () {
             studentListDiv.innerHTML = data.map(student =>
                 `<label><input type="checkbox" class="student-checkbox" value="${student.student_id}"> ${student.student_name} (${student.student_id})</label><br>`
             ).join('');
+
+            loadTeams();
         });
 
-    // ✅ 2. 팀원 선택 → 팀장 선택 목록 자동 구성
+    // 2. 팀원 선택 → 팀장 선택 목록 자동 구성
     studentListDiv.addEventListener('change', function () {
         const checkboxes = document.querySelectorAll('.student-checkbox:checked');
         selectedMembers = Array.from(checkboxes).map(cb => cb.value);
@@ -41,7 +43,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }).join('');
     });
 
-    // ✅ 3. 팀 생성 / 수정
+    // 3. 팀 생성 / 수정
     teamForm.addEventListener('submit', function (e) {
         e.preventDefault();
         if (selectedMembers.length < 2) {
@@ -74,16 +76,25 @@ document.addEventListener('DOMContentLoaded', function () {
             });
     });
 
-    // ✅ 4. 팀 목록 불러오기
+    // 4. 팀 목록 불러오기
     function loadTeams() {
         fetch('/team/team_list/')
             .then(res => res.json())
             .then(teams => {
-                teamTableBody.innerHTML = teams.map(team => `
+                teamTableBody.innerHTML = teams.map(team => {
+                    const leaderName = allStudents.find(s => s.student_id === team.leader_id)?.student_name || team.leader_id;
+
+                    const memberIds = [team.leader_id, team.mate1_id, team.mate2_id, team.mate3_id, team.mate4_id].filter(Boolean);
+                    const memberNames = memberIds.map(id => {
+                        const student = allStudents.find(s => s.student_id === id);
+                        return student ? `${student.student_name} (${id})` : id;
+                    }).join(', ');
+
+                    return `
                     <tr data-team-id="${team.team_id}">
                         <td>${team.team_name}</td>
-                        <td>${[team.leader_id, team.mate1_id, team.mate2_id, team.mate3_id, team.mate4_id].filter(Boolean).join(', ')}</td>
-                        <td>${team.leader_id}</td>
+                        <td>${memberNames}</td>
+                        <td>${leaderName}</td>
                         <td>
                             <div class="menu-wrapper">
                                 <button class="menu-btn">⋯</button>
@@ -94,8 +105,9 @@ document.addEventListener('DOMContentLoaded', function () {
                                 </div>
                             </div>
                         </td>
-                    </tr>
-                `).join('');
+                    </tr>`;
+
+                }).join('');
             });
     }
 
@@ -141,7 +153,6 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     // ✅ 6. 초기화 및 필터
-    loadTeams();
     document.getElementById('search-team').addEventListener('input', function () {
         const keyword = this.value.toLowerCase();
         document.querySelectorAll('#team-table-body tr').forEach(row => {

@@ -137,3 +137,37 @@ td.team-leader {
     font-weight: bold;
     color: #2c3e50;
 }
+
+.btn-view {
+    display: inline-block;
+    padding: 6px 12px;
+    background-color: #007bff;
+    color: white;
+    border-radius: 4px;
+    text-decoration: none;
+    font-size: 14px;
+    transition: background-color 0.3s ease;
+}
+.btn-view:hover {
+    background-color: #0056b3;
+}
+
+
+.team-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+    background-color: #fff;
+}
+
+.team-table th,
+.team-table td {
+    border: 1px solid #ddd;
+    padding: 12px;
+    text-align: center;
+}
+
+.team-table th {
+    background-color: #f2f2f2;
+    font-weight: bold;
+}

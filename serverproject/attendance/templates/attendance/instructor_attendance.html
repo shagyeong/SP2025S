@@ -38,11 +38,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 const row = document.createElement("tr");
                 row.innerHTML = `
                     <td>${team.team_name}</td>
-                    <td>${team.leader_id}</td>
+                    <td>${team.leader_name || team.leader_id}</td>
                     <td>
-                        <a class="btn" href="/attendance/${team.team_id}/">출결 보기</a>
+                        <a class="btn btn-view" href="/attendance/instructor/detail/?team_id=${encodeURIComponent(team.team_id)}">출결 보기</a>
                     </td>
                 `;
+                // 팀장 이름이 없을 경우 학번으로 표시
                 tbody.appendChild(row);
             });
         })

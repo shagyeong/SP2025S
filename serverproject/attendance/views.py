@@ -47,3 +47,7 @@ def attendance_view(request):
 
 def instructor_attendance(request):
     return render(request, 'attendance/instructor_attendance.html')
+
+def team_attendance(request):
+    rounds = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
+    return render(request, 'attendance/team_attendance.html', {"rounds": rounds})

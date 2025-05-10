@@ -1,14 +1,39 @@
-// student.js
+// 학생용 student.js
 
+let currentTeamId = null;
+
+// 초기화
 document.addEventListener("DOMContentLoaded", function () {
     console.log("🎓 Student JS Loaded");
 
-    // 1️⃣ 팀 목록 버튼 렌더링
+    // // 테스트용 더미 데이터
+    // const dummyTeams = [
+    //     {
+    //         team_id: "T01",
+    //         team_name: "Alpha Team",
+    //         leader_name: "신하경",
+    //         members: ["신하경", "박하민", "변진영"]
+    //     },
+    //     {
+    //         team_id: "T02",
+    //         team_name: "Bravo Team",
+    //         leader_name: "일일일",
+    //         members: ["일일일", "이이이", "삼삼삼"]
+    //     }
+    // ];
+
+    // // fetch 건너뛰고 바로 렌더
+    // renderTeamButtons(dummyTeams);
+
+    // 팀 목록 불러오기
     fetch("/api/my-teams")
         .then(res => res.json())
         .then(data => {
             renderTeamButtons(data.teams);
         });
+
+    // 채팅 전송 이벤트 등록
+    document.getElementById("send-chat")?.addEventListener("click", sendMessage);
 });
 
 function renderTeamButtons(teams) {
@@ -20,23 +45,49 @@ function renderTeamButtons(teams) {
         btn.textContent = team.team_name;
         btn.classList.add("team-button");
         btn.onclick = () => {
-            loadTeamInfo(team.team_id);
+            currentTeamId = team.team_id;
             document.querySelectorAll('.team-button').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
+            loadTeamInfo(team.team_id);
+            fetchChatMessages();
+            fetchReservations();
         };
         teamContainer.appendChild(btn);
     });
 
-    // ✅ 첫 번째 팀 자동 선택
     if (teams.length > 0) {
-        const firstButton = teamContainer.querySelector(".team-button");
-        firstButton.click();
+        teamContainer.querySelector(".team-button").click();
     }
 }
 
-
-// 2️⃣ 선택된 팀 정보 불러오기 및 렌더링
 function loadTeamInfo(teamId) {
+    // const team = teamId === "T01" ? {
+    //     team_name: "Alpha Team",
+    //     leader_name: "신하경",
+    //     members: ["신하경", "박하민", "변진영"]
+    // } : {
+    //     team_name: "Bravo Team",
+    //     leader_name: "일일일",
+    //     members: ["일일일", "이이이", "삼삼삼"]
+    // };
+
+    // const documents = [
+    //     { title: "문서1", status: "작성중" },
+    //     { title: "문서2", status: "완료" }
+    // ];
+
+    // const attendance = [
+    //     { round: 1, name: "신하경", status: "출석" },
+    //     { round: 1, name: "박하민", status: "결석" },
+    //     { round: 2, name: "변진영", status: "출석" }
+    // ];
+
+
+    // // ✅ fetch 건너뛰고 바로 렌더
+    // renderTeamInfo(team);
+    // renderTeamDocuments(documents);
+    // renderAttendance(attendance);
+    
     fetch(`/api/my-team/${teamId}`)
         .then(res => res.json())
         .then(data => {
@@ -47,14 +98,10 @@ function loadTeamInfo(teamId) {
 }
 
 function renderTeamInfo(team) {
-    const info = document.getElementById("team-info");
-    info.innerHTML = `
-        <div class="box">
-            <h3>🧾 팀 정보</h3>
-            <p><strong>팀 이름:</strong> ${team.team_name}</p>
-            <p><strong>팀장:</strong> ${team.leader_name}</p>
-            <p><strong>팀원:</strong> ${team.members.join(", ")}</p>
-        </div>
+    document.getElementById("team-name").textContent = `👥 ${team.team_name}`;
+    document.getElementById("team-members").innerHTML = `
+        <p><strong>팀장:</strong> ${team.leader_name}</p>
+        <p><strong>팀원:</strong> ${team.members.join(", ")}</p>
     `;
 }
 
@@ -94,4 +141,49 @@ function renderAttendance(attendance) {
     });
     html += "</tbody></table>";
     container.innerHTML = html;
+}
+
+function fetchChatMessages() {
+    fetch(`/api/chat/?team_id=${currentTeamId}`)
+        .then(res => res.json())
+        .then(data => {
+            const chatBox = document.getElementById("chat-box");
+            chatBox.innerHTML = "";
+            data.messages.forEach(msg => {
+                const div = document.createElement("div");
+                div.textContent = `${msg.sender}: ${msg.message} (${msg.timestamp})`;
+                chatBox.appendChild(div);
+            });
+        });
+}
+
+function sendMessage() {
+    const chatInput = document.getElementById("chat-input");
+    const message = chatInput?.value.trim();
+    if (!message || !currentTeamId) return;
+
+    fetch("/api/chat/send/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message, team_id: currentTeamId })
+    })
+    .then(res => res.json())
+    .then(() => {
+        chatInput.value = "";
+        fetchChatMessages();
+    });
+}
+
+function fetchReservations() {
+    fetch(`/api/reservations/?team_id=${currentTeamId}`)
+        .then(res => res.json())
+        .then(data => {
+            const list = document.getElementById("reservation-list");
+            list.innerHTML = "";
+            data.reservations.forEach(res => {
+                const li = document.createElement("li");
+                li.textContent = `📍 ${res.place} @ ${res.time}`;
+                list.appendChild(li);
+            });
+        });
 }
