@@ -30,5 +30,6 @@ urlpatterns = [
     path('reservation/', include('reservation.urls', namespace='reservation')),
     path('team/', include('team.urls', namespace='team')),
     path('instructor/', include('instructor.urls', namespace='instructor')),
+    path('common/',include('common.urls')),
     #path('team/api/', include('team.urls')),
 ]
