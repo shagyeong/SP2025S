@@ -22,7 +22,8 @@ def index(request):
 
 #  교수자 페이지
 def instructor_view(request):
-    return render(request, 'mainpage/instructor.html')
+    rounds = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
+    return render(request, 'instructor/instructor.html', {"rounds": rounds})
 
 
 # Team 모델 없이 문서 페이지 보여주기 (프론트 확인용 더미)
@@ -57,94 +58,3 @@ def documents_view(request):
 #     })
 
 
-# 여긴 현재 안 쓰는 중이므로 삭제 가능
-
-# # ➕ 문서 생성
-# @csrf_exempt
-# def create_notion_document(request):
-#     if request.method == "POST":
-#         title = request.POST.get("title")
-#         status = request.POST.get("status")
-
-#         payload = {
-#             "parent": {"database_id": DATABASE_ID},
-#             "properties": {
-#                 "Name": {
-#                     "title": [{"text": {"content": title}}]
-#                 },
-#                 "Status": {
-#                     "status": {"name": status}
-#                 }
-#             }
-#         }
-#         requests.post(f"{NOTION_BASE_URL}/pages", headers=HEADERS, json=payload)
-#         return redirect("mainpage:documents")
-
-# # ✏️ 문서 수정
-# @csrf_exempt
-# def update_notion_document(request, page_id):
-#     if request.method == "POST":
-#         page_id = '-'.join([page_id[:8], page_id[8:12], page_id[12:16], page_id[16:20], page_id[20:]])
-#         new_title = request.POST.get("title")
-#         new_status = request.POST.get("status")
-
-#         payload = {
-#             "properties": {
-#                 "Name": {
-#                     "title": [{"text": {"content": new_title}}]
-#                 },
-#                 "Status": {
-#                     "status": {"name": new_status}
-#                 }
-#             }
-#         }
-
-#         url = f"{NOTION_BASE_URL}/pages/{page_id}"
-#         res = requests.patch(url, headers=HEADERS, json=payload)
-
-#         if res.status_code == 200:
-#             return JsonResponse({"message": "수정 완료"}, status=200)
-#         else:
-#             return JsonResponse({"error": res.json()}, status=400)
-
-# # 🗑 문서 삭제 (archive)
-# def delete_notion_document(request, page_id):
-#     if request.method == "POST":
-#         url = f"{NOTION_BASE_URL}/pages/{page_id}"
-#         payload = {"archived": True}
-#         res = requests.patch(url, headers=HEADERS, json=payload)
-
-#         if res.status_code == 200:
-#             return redirect("mainpage:documents")
-#         else:
-#             return JsonResponse({"error": res.json()}, status=400)
-
-# # 🔄 상태 동기화
-# def notion_sync_status(request):
-#     url = f"{NOTION_BASE_URL}/databases/{DATABASE_ID}/query"
-#     response = requests.post(url, headers=HEADERS)
-
-#     if response.status_code != 200:
-#         return JsonResponse({"error": response.json()}, status=400)
-
-#     data = response.json()
-#     synced = []
-
-#     for result in data.get("results", []):
-#         page_id = result["id"]
-#         title_info = result["properties"]["Name"]["title"]
-#         title = title_info[0]["plain_text"] if title_info else "제목 없음"
-#         status = result["properties"]["Status"]["status"]["name"]
-#         synced.append({"id": page_id, "title": title, "status": status})
-
-#     return JsonResponse({"synced_documents": synced})
-
-# # ✅ API 연결 상태 확인
-# def notion_status_check(request):
-#     url = f"{NOTION_BASE_URL}/databases/{DATABASE_ID}"
-#     res = requests.get(url, headers=HEADERS)
-#     if res.status_code == 200:
-#         return JsonResponse({"status": "연결 성공"})
-#     else:
-#         return JsonResponse({"status": "연결 실패", "code": res.status_code})
-    

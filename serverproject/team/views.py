@@ -66,5 +66,6 @@ class TeamListView(APIView):
         teams = Team.objects.all()
         serializer = TeamSerializer(teams, many=True)
         return Response(serializer.data)
-def team_view(request):
-    return render(request, 'team/team.html')
+    
+    def team_view(request):
+        return render(request, 'team/team.html')
