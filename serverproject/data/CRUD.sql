@@ -26,6 +26,16 @@ delete from team where team_id='01-001SP2024S-1';
 
 
 -- 출결 확인
+-- POST /attendance/{team_id}/{round}: 특정 팀과 회차의 출결부 생성
+INSERT INTO `attendance` VALUES(
+    '01-001SP2024S-1',      -- tean_id
+    '01',                   -- round
+    'x',                    -- at_leader
+    'x',                    -- at_1
+    'x',                    -- at_2
+    'x',                    -- at_3
+    'x'                     -- at_4
+);
 -- POST /attendance: 출결 기록
 UPDATE attendance
 SET at_leader='o',
@@ -38,3 +48,10 @@ WHERE team_id='01-001SP2025S-1' and round='01';
 select * from attendance WHERE team_id='01-001SP2025S-1';
 -- GET /attendance/{team_id}/{round}: 특정 팀과 회차의 출결 조회
 select * from attendance WHERE team_id='01-001SP2025S-1' and round='01';
+-- GET /attendance/{team_id}: 특정 팀의 명단 조회
+select student_name from student where student_id in
+(select leader_id from team where team_id="01-001SP2025S-1") OR student_id in
+(select mate1_id from team where team_id="01-001SP2025S-1") OR student_id in
+(select mate2_id from team where team_id="01-001SP2025S-1") OR student_id in
+(select mate3_id from team where team_id="01-001SP2025S-1") OR student_id in
+(select mate4_id from team where team_id="01-001SP2025S-1");
