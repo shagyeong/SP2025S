@@ -27,6 +27,24 @@ body {
     align-items: center;
 }
 
+.navbar a {
+  color: white !important;
+  text-decoration: none !important;
+}
+
+.navbar a:hover {
+  text-decoration: underline;
+}
+
+.nav-link {
+    color: white;
+    text-decoration: none;
+}
+
+.nav-link:hover {
+    text-decoration: underline;
+}
+
 .menu {
     display: flex;
     gap: 20px;
