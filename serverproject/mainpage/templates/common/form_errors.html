@@ -1,18 +1,19 @@
 <!-- 필드 오류와 넌필드 오류를 출력한다. -->
 {% if form.errors %}
-<div class="alert alert-danger">
+<div class="form-errors" style="background: #ffe6e6; border: 1px solid #ff9999; padding: 16px; border-radius: 8px; margin-bottom: 15px;">
     {% for field in form %}
-    <!-- 필드 오류 -->
-    {% if field.errors %}
-    <div>
-        <strong>{{ field.label }}</strong>
-        {{ field.errors }}
-    </div>
-    {% endif %}
+        <!-- 필드 오류 -->
+        {% if field.errors %}
+        <div style="margin-bottom: 8px;">
+            <strong>{{ field.label }}:</strong>
+            {{ field.errors|striptags }}
+        </div>
+        {% endif %}
     {% endfor %}
+
     <!-- 넌필드 오류 -->
     {% for error in form.non_field_errors %}
-    <div>
+    <div style="margin-top: 10px;">
         <strong>{{ error }}</strong>
     </div>
     {% endfor %}

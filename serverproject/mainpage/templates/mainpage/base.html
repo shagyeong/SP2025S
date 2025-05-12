@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}팀플 헬퍼{% endblock %}</title>
 
-    <!-- ✅ 공통 스타일 -->
+    <!-- 공통 스타일 -->
     <link rel="stylesheet" href="{% static 'mainpage/css/main.css' %}">
     <link rel="stylesheet" href="{% static 'mainpage/css/student.css' %}">
     <link rel="stylesheet" href="{% static 'mainpage/css/notion.css' %}">
@@ -18,7 +18,7 @@
     }
     </style>
 
-    <!-- ✅ 페이지 전용 스타일 -->
+    <!-- 페이지 전용 스타일 -->
     {% block extra_css %}{% endblock %}
 </head>
 <body>
@@ -28,11 +28,11 @@
         {% block content %}{% endblock %}
     </main>
 
-    <!-- ✅ 공통 스크립트 (선택사항) -->
+    <!-- 공통 스크립트 (선택사항) -->
     <script src="{% static 'mainpage/js/main.js' %}"></script>
     <script src="{% static 'mainpage/js/student.js' %}"></script>
 
-    <!-- ✅ 페이지 전용 스크립트 -->
+    <!-- 페이지 전용 스크립트 -->
     {% block extra_js %}{% endblock %}
 </body>
 </html>
