@@ -84,8 +84,8 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'SP2025S',
-	'USER': 'root',
-	'PASSWORD': 'root',
+	'USER': 'shagyeong',
+	'PASSWORD': '1234',
 	'HOST': '127.0.0.1',
 	'PORT': '3306',
         'OPTIONS': {
@@ -137,3 +137,5 @@ STATICFILES_DIRS = [BASE_DIR / 'mainpage' / 'static']
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+LOGIN_REDIRECT_URL = 'http://localhost:8000/'
