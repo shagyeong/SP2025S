@@ -1,4 +1,4 @@
-// ✅ instructor.js (백엔드 API 연동 기반 수정 완료)
+// instructor.js (백엔드 API 연동 기반 수정 완료)
 
 document.addEventListener('DOMContentLoaded', function () {
     const studentListDiv = document.getElementById('student-list');
@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', function () {
     let editMode = false;
     let editingTeamId = null;
 
-    // 1. 학생 목록 가져오기
+    // 학생 목록 가져오기
     fetch('/api/students')
         .then(res => res.json())
         .then(data => {
@@ -26,7 +26,7 @@ document.addEventListener('DOMContentLoaded', function () {
             loadTeams();
         });
 
-    // 2. 팀원 선택 → 팀장 선택 목록 자동 구성
+    // 팀원 선택 → 팀장 선택 목록 자동 구성
     studentListDiv.addEventListener('change', function () {
         const checkboxes = document.querySelectorAll('.student-checkbox:checked');
         selectedMembers = Array.from(checkboxes).map(cb => cb.value);
@@ -43,7 +43,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }).join('');
     });
 
-    // 3. 팀 생성 / 수정
+    // 팀 생성 / 수정
     teamForm.addEventListener('submit', function (e) {
         e.preventDefault();
         if (selectedMembers.length < 2) {
@@ -76,7 +76,7 @@ document.addEventListener('DOMContentLoaded', function () {
             });
     });
 
-    // 4. 팀 목록 불러오기
+    // 팀 목록 불러오기
     function loadTeams() {
         fetch('/team/team_list/')
             .then(res => res.json())
@@ -111,11 +111,12 @@ document.addEventListener('DOMContentLoaded', function () {
             });
     }
 
-    // ✅ 5. 출결 상세 보기
+    // 출결 상세 보기
     document.addEventListener('click', function (e) {
         const teamId = e.target.closest('tr')?.dataset.teamId;
         if (e.target.classList.contains('attendance-btn')) {
-            window.location.href = `/attendance/${teamId}/`;
+            const teamID = e.target.closest('tr')?.dataset.teamId;
+            window.location.href = `/attendance/instructor/detail/?team_id=${encodeURIComponent(teamId)}`;
         }
         if (e.target.classList.contains('edit-btn')) {
             fetch(`/team/teams/${teamId}`)
@@ -152,7 +153,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    // ✅ 6. 초기화 및 필터
+    // 초기화 및 필터
     document.getElementById('search-team').addEventListener('input', function () {
         const keyword = this.value.toLowerCase();
         document.querySelectorAll('#team-table-body tr').forEach(row => {
@@ -161,7 +162,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-    // ✅ 팀 생성 폼 열기 / 닫기
+    // 팀 생성 폼 열기 / 닫기
     window.openCreateForm = function () {
         editMode = false;
         editingTeamId = null;

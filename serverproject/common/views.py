@@ -1,6 +1,7 @@
 from django.contrib.auth import authenticate, login, logout
 from django.shortcuts import render, redirect
 from common.forms import UserForm
+from django.contrib.auth.decorators import login_required
 
 def logout_view(request):
     logout(request)
@@ -19,3 +20,7 @@ def signup(request):
     else:
         form = UserForm()
     return render(request, 'common/signup.html', {'form': form})
+
+@login_required
+def mypage(request):
+    return render(request, 'common/mypage.html')

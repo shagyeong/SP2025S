@@ -1,0 +1,77 @@
+{% extends "../mainpage/base.html" %}
+{% load static %}
+
+{% block title %}마이페이지{% endblock %}
+
+{% block extra_css %}
+<style>
+.mypage-box {
+    max-width: 460px;
+    margin: 80px auto;
+    padding: 40px;
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
+}
+
+.mypage-box h2 {
+    text-align: center;
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 30px;
+}
+
+.mypage-box p {
+    font-size: 16px;
+    margin-bottom: 12px;
+}
+
+.mypage-box .btn-area {
+    display: flex;
+    gap: 12px;
+    margin-top: 30px;
+}
+
+.mypage-box .btn-area a {
+    flex: 1;
+    padding: 12px;
+    text-align: center;
+    font-weight: bold;
+    font-size: 15px;
+    text-decoration: none;
+    border-radius: 8px;
+    transition: background-color 0.3s ease;
+    color: white;
+}
+
+.mypage-box .btn-primary {
+    background-color: #3b6bff;
+}
+
+.mypage-box .btn-primary:hover {
+    background-color: #274bcc;
+}
+
+.mypage-box .btn-secondary {
+    background-color: #6c757d;
+}
+
+.mypage-box .btn-secondary:hover {
+    background-color: #5a6268;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="mypage-box">
+    <h2>🔐 마이페이지</h2>
+
+    <p><strong>아이디:</strong> {{ user.username }}</p>
+    <p><strong>이메일:</strong> {{ user.email }}</p>
+
+    <div class="btn-area">
+        <a href="{% url 'common:password_change' %}" class="btn-primary">비밀번호 변경</a>
+        <a href="{% url 'common:logout' %}" class="btn-secondary">로그아웃</a>
+    </div>
+</div>
+{% endblock %}
