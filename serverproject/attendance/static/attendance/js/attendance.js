@@ -41,7 +41,7 @@ document.addEventListener("DOMContentLoaded", function () {
             at_mate4: checkboxes[4]?.checked ? 'o' : 'x'
         };
 
-        fetch("/attendance/attendance/", {
+        fetch("/api/attendance/attendance/", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(attendance)
@@ -72,7 +72,7 @@ function fetchAttendanceHistory(teamId) {
     const rounds = ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10"];
 
     rounds.forEach(round => {
-        fetch(`/attendance/attendance/${teamId}/${round}/`)
+        fetch(`/api/attendance/attendance/${teamId}/round/?round=${round}`)
             .then(res => res.ok ? res.json() : null)
             .then(data => {
                 if (!data) return;

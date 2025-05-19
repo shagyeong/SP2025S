@@ -26,7 +26,7 @@
         <thead>
             <tr>
                 <th>역할</th>
-                <th>학번</th>
+                <th>학번 </th>
                 <th>출결</th>
             </tr>
         </thead>
@@ -35,7 +35,7 @@
         </tbody>
     </table>
 
-    <button onclick="goBack()" style="margin-top: 20px;">← 돌아가기</button>
+    <button onclick="goBack()" style="margin-top: 20px;">돌아가기</button>
 </div>
 {% endblock %}
 
@@ -52,7 +52,7 @@ function getQueryParam(param) {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-    // ✅ URL 쿼리스트링에서 team_id 가져오기
+    // URL 쿼리스트링에서 team_id 가져오기
     const params = new URLSearchParams(window.location.search);
     const teamId = params.get("team_id");
 
@@ -61,9 +61,10 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     document.getElementById("load-team-attendance").addEventListener("click", () => {
+        const teamId = document.getElementById("team-id").value.trim();
         const round = document.getElementById("round-select").value;
-
-        fetch(`/attendance/${teamId}/${round}/`)
+       
+        fetch(`/api/attendance/${teamId}/round/?round=${round}`)
             .then(res => res.json())
             .then(data => {
                 const tableBody = document.getElementById("attendance-body");

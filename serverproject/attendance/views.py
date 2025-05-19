@@ -5,6 +5,7 @@ from rest_framework import status
 from django.shortcuts import get_object_or_404
 from .models import Attendance
 from .serializers import AttendanceSerializer
+from team.models import Team
 
 class AttendanceListCreateView(APIView):
     """POST /attendance  (출결 기록 추가)"""
@@ -27,14 +28,41 @@ class AttendanceByTeamView(APIView):
 class AttendanceByRoundView(APIView):
     """GET /attendance/{team_id}/{round} 조회 & PUT 수정"""
     
-    def get(self, request, team_id, round):
-        attendance = get_object_or_404(Attendance, team_id=team_id, round=round)
-        serializer = AttendanceSerializer(attendance)
-        return Response(serializer.data)
+    def get(self, request, team_id):
+        round_number = request.query_params.get('round')
+        if not round_number:
+            return Response({"error": "Missing 'round' parameter"}, status=status.HTTP_400_BAD_REQUEST)
 
-    def put(self, request, team_id, round):
-        attendance = get_object_or_404(Attendance, team_id=team_id, round=round)
+        round_number = round_number.zfill(2)
+        attendance = get_object_or_404(Attendance, team_id=team_id, round=round_number)
+        serializer = AttendanceSerializer(attendance)
+
+        # 팀 정보 가져오기
+        team = get_object_or_404(Team, team_id=team_id)
+        team_info = {
+            "leader_id": team.leader_id,
+            "mate1_id": team.mate1_id,
+            "mate2_id": team.mate2_id,
+            "mate3_id": team.mate3_id,
+            "mate4_id": team.mate4_id,
+        }
+
+        return Response({
+            **serializer.data,
+            "team": team_info  # 프론트에서 team.mate1_id 등으로 접근할 수 있도록
+        })
+
+
+    def put(self, request, team_id):
+        round_number = request.query_params.get('round')
+        if not round_number:
+            return Response({"error": "Missing 'round' parameter"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        round_number = round_number.zfill(2)  # 1 → '01', 2 → '02' 형식으로 보정
+        attendance = get_object_or_404(Attendance, team_id=team_id, round=round_number)
         serializer = AttendanceSerializer(attendance, data=request.data)
+        
+
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)

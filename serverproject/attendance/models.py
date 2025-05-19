@@ -1,7 +1,7 @@
 from django.db import models
 
 class Attendance(models.Model):
-    team_id = models.CharField(max_length=15)
+    team_id = models.CharField(max_length=15, primary_key=True)
     round = models.CharField(max_length=2)
     at_leader = models.CharField(max_length=1, null=True, blank=True)
     at_mate1 = models.CharField(max_length=1, null=True, blank=True)
