@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import login_required
 
 def logout_view(request):
     logout(request)
-    return redirect('index')
+    return redirect('/')
 
 def signup(request):
     if request.method == "POST":
