@@ -75,7 +75,14 @@
     <form method="post" action="{% url 'common:login' %}">
         {% csrf_token %}
         {% include "./form_errors.html" %}
-
+        <div class="form-group">
+            <label for="user_type">사용자 유형</label>
+            <select name="user_type" id="user_type">
+                <option value="student">학생</option>
+                <option value="instructor">교수자</option>
+            </select>
+        </div>
+    
         <div class="form-group">
             <label for="username">사용자 ID</label>
             <input type="text" name="username" id="username" placeholder="아이디를 입력하세요"
@@ -86,9 +93,10 @@
             <input type="password" name="password" id="password" placeholder="비밀번호를 입력하세요"
                    value="{{ form.password.value|default_if_none:'' }}">
         </div>
-
+    
         <button type="submit">로그인</button>
     </form>
+    
 
     <div class="login-bottom-link">
         <br>

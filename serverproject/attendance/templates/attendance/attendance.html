@@ -4,7 +4,15 @@
 {% load static %}
 
 {% block content %}
-<div class="container" data-team-id="{{ team_id }}">
+<div class="container" data-team-id="{{ selected_team.team_id }}">
+    <form method="get" style="margin-bottom: 1rem;">
+      <label for="team">팀 선택:</label>
+      <select name="team" id="team" onchange="this.form.submit()">
+        {% for team in teams %}
+          <option value="{{ team.team_id }}" {% if team.team_id == selected_team.team_id %}selected{% endif %}>{{ team.team_name }}</option>
+        {% endfor %}
+      </select>
+    </form>
     <!-- 오늘의 출결 확인 -->
     <section class="attendance-section">
         <h2>출결 확인</h2>
@@ -38,5 +46,5 @@
 {% endblock %}
 
 {% block scripts %}
-<script src="{ % static 'attendance/js/attendance.js' % }" defer></script>
+<script src="{% static 'attendance/js/attendance.js' %}" defer></script>
 {% endblock %}

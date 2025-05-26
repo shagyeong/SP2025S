@@ -9,6 +9,11 @@ from django.shortcuts import get_object_or_404
 from .models import Instructor
 from team.models import Team
 from .serializers import InstructorSerializer
+from django.contrib.auth.decorators import login_required
+
+@login_required
+def instructor_view(request):
+    return render(request, 'instructor/instructor.html')
 
 # 교수자 생성
 class InstructorCreateView(APIView):

@@ -2,28 +2,34 @@
 
 document.addEventListener("DOMContentLoaded", function () {
     const teamId = document.querySelector('[data-team-id]')?.dataset.teamId;
-    console.log("출결 페이지 로드됨: ", teamId);
+    console.log("출결 페이지 로드됨 - teamId:", teamId);
 
-    // 팀원 이름 가져와 체크박스 표시
-    fetch(`/api/my-team/${teamId}`)
+    if (!teamId) {
+        console.error("teamId 누락");
+        return;
+    }
+
+    // 팀원 이름 + 학번 체크박스 표시
+    fetch(`/team/teams/${teamId}`)
         .then(res => res.json())
         .then(data => {
-            const memberRoles = [
-                { role: "leader", name: data.team.leader_name },
-                { role: "mate1", name: data.team.members[0] },
-                { role: "mate2", name: data.team.members[1] },
-                { role: "mate3", name: data.team.members[2] },
-                { role: "mate4", name: data.team.members[3] },
-            ];
+            const members = [];
+            members.push({ id: data.leader_id, name: data.leader_name });
+            ['mate1_id', 'mate2_id', 'mate3_id', 'mate4_id'].forEach(key => {
+                if (data[key]) {
+                    members.push({ id: data[key], name: data[key] });  // 이름 없음 → 학번으로 대체
+                }
+            });
 
             const checklist = document.getElementById("attendance-checklist");
-            checklist.innerHTML = memberRoles.filter(m => m.name).map(m => `
+            checklist.innerHTML = members.map((m, i) => `
                 <label>
-                    <input type="checkbox" data-role="${m.role}">
-                    ${m.name} (${m.role === 'leader' ? '팀장' : '팀원'})
+                    <input type="checkbox" name="attendance" data-role="${i === 0 ? 'leader' : 'mate' + i}">
+                    ${m.name} (${i === 0 ? '팀장' : '팀원'})
                 </label><br>
             `).join('');
-        });
+        })
+        .catch(err => console.error("팀 정보 불러오기 실패:", err));
 
     // 출석 등록
     document.getElementById("submit-attendance").addEventListener("click", () => {
@@ -34,7 +40,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const attendance = {
             team_id: teamId,
             round: round,
-            at_leader: checkboxes[0].checked ? 'o' : 'x',
+            at_leader: checkboxes[0]?.checked ? 'o' : 'x',
             at_mate1: checkboxes[1]?.checked ? 'o' : 'x',
             at_mate2: checkboxes[2]?.checked ? 'o' : 'x',
             at_mate3: checkboxes[3]?.checked ? 'o' : 'x',
@@ -50,14 +56,14 @@ document.addEventListener("DOMContentLoaded", function () {
         .then(data => {
             alert("출석이 등록되었습니다.");
             document.getElementById("attendance-timestamp").textContent = "타임스탬프: " + new Date().toLocaleString();
-            fetchAttendanceHistory(teamId);  // 등록 후 갱신
+            fetchAttendanceHistory(teamId);  // 등록 후 이력 갱신
         })
         .catch(err => console.error("출석 등록 실패:", err));
     });
 
-    fetchAttendanceHistory(teamId); // 페이지 진입 시 전체 출결 내역 로드
+    // 전체 회차 출결 내역 로드
+    fetchAttendanceHistory(teamId);
 });
-
 
 function fetchAttendanceHistory(teamId) {
     const tbody = document.getElementById("history-list");
@@ -89,6 +95,6 @@ function fetchAttendanceHistory(teamId) {
                     tbody.appendChild(tr);
                 });
             })
-            .catch(err => console.warn(`회차 ${round} 데이터 없음`, err));
+            .catch(err => console.warn(`⚠️ 회차 ${round} 데이터 없음`, err));
     });
 }

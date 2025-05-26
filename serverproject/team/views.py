@@ -25,6 +25,7 @@ class TeamCreateView(APIView):
                 return Response({"error": "Leader not found"}, status=400)
 
             # 팀 생성
+            notion_url = create_notion_page(data.get("team_name"))
             team = Team.objects.create(
                 team_id=str(uuid.uuid4())[:15],  # team_id를 UUID로 생성 (또는 다른 방식 사용 가능)
                 team_name=data.get("team_name"),
@@ -33,6 +34,7 @@ class TeamCreateView(APIView):
                 mate2_id=data.get("mate2_id"),
                 mate3_id=data.get("mate3_id"),
                 mate4_id=data.get("mate4_id"),
+                notion_url=notion_url
             )
 
             return Response(TeamSerializer(team).data, status=201)

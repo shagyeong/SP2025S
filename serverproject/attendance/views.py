@@ -5,6 +5,7 @@ from rest_framework import status
 from django.shortcuts import get_object_or_404
 from .models import Attendance
 from .serializers import AttendanceSerializer
+from django.contrib.auth.decorators import login_required
 from team.models import Team
 
 class AttendanceListCreateView(APIView):
@@ -70,9 +71,28 @@ class AttendanceByRoundView(APIView):
 
 
 
-def attendance_view(request):
-    return render(request, 'attendance/attendance.html')
+# def attendance_view(request):
+#     return render(request, 'attendance/attendance.html')
 
+@login_required
+def attendance_view(request):
+    student_id = request.user.username
+
+    # 학생이 속한 모든 팀 필터링 (Q 객체 이용해도 좋지만 여기선 단순히 union)
+    team_list = Team.objects.filter(leader_id=student_id) | \
+                Team.objects.filter(mate1_id=student_id) | \
+                Team.objects.filter(mate2_id=student_id) | \
+                Team.objects.filter(mate3_id=student_id) | \
+                Team.objects.filter(mate4_id=student_id)
+
+    # 쿼리 스트링으로 선택된 팀 받기
+    selected_team_id = request.GET.get("team")
+    selected_team = team_list.filter(team_id=selected_team_id).first() if selected_team_id else team_list.first()
+
+    return render(request, 'attendance/attendance.html', {
+        "teams": team_list,
+        "selected_team": selected_team,
+    })
 def instructor_attendance(request):
     return render(request, 'attendance/instructor_attendance.html')
 

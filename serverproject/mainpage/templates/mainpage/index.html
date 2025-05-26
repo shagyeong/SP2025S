@@ -6,13 +6,16 @@
 
 
 <div class="container">
-  <h2>🎓 팀 선택</h2>
-  <div class="team-button-list" id="team-buttons">
-    <!-- 버튼들이 JS로 렌더링됨 -->
-    <button class="team-button" data-team-id="teamA">A팀</button>
-    <button class="team-button" data-team-id="teamB">B팀</button>
-  </div>
-  </div>
+  <form method="get" style="margin-bottom: 1rem;">
+    <label for="team">팀 선택:</label>
+    <select name="team" id="team" onchange="this.form.submit()">
+      {% for team in teams %}
+        <option value="{{ team.team_id }}" {% if team.team_id == selected_team.team_id %}selected{% endif %}>
+          {{ team.team_name }}
+        </option>
+      {% endfor %}
+    </select>
+  </form>
 
   <div class="box" id="team-info">
     <h3 id="team-name">👥 팀 정보</h3>

@@ -85,6 +85,7 @@ CREATE TABLE `team`(
     `mate2_id` varchar(6) DEFAULT NULL,
     `mate3_id` varchar(6) DEFAULT NULL,
     `mate4_id` varchar(6) DEFAULT NULL,
+    `notion_url` varchar(255) DEFAULT NULL, /* 추가 */
     PRIMARY KEY (`team_id`),
     KEY `leader_id` (`leader_id`),
     CONSTRAINT `team_fk_1` FOREIGN KEY (`leader_id`)

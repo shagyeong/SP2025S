@@ -12,6 +12,7 @@ class Team(models.Model):
     mate2_id = models.CharField(max_length=6, null=True, blank=True)
     mate3_id = models.CharField(max_length=6, null=True, blank=True)
     mate4_id = models.CharField(max_length=6, null=True, blank=True)
+    notion_url = models.URLField(null=True, blank=True)
 
     class Meta:
         managed = False
