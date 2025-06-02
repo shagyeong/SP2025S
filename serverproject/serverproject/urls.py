@@ -25,13 +25,10 @@ from django.urls import path, include
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('mainpage.urls', namespace='mainpage')),
-    path('attendance/', include('attendance.urls', namespace='attendance')),
-    path('api/attendance/', include('attendance.urls')),
-    path('chat/', include('chat.urls', namespace='chat')),
-    path('reservation/', include('reservation.urls', namespace='reservation')),
-    path('team/', include('team.urls', namespace='team')),
-    path('api/', include('team.urls')),
+    path('attendance/', include('attendance.urls', namespace='attendance_pages')), # 일반 페이지용
+    path('api/attendance/', include('attendance.urls', namespace='attendance_api')), # API용
+    path('team/', include('team.urls', namespace='team_pages')),                   # 일반 페이지용
+    path('api/', include('team.urls', namespace='team_api')),                      # API용
     path('instructor/', include('instructor.urls', namespace='instructor')),
     path('common/',include('common.urls')),
-    #path('team/api/', include('team.urls')),
 ]
