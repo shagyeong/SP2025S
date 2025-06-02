@@ -85,8 +85,8 @@ class MyTeamListView(APIView):
         user = request.user # 현재 로그인한 사용자 객체
         student_id = user.username # User 모델의 username을 student_id로 사용한다고 가정
 
-        # 로그인한 학생이 속한 팀들을 필터링합니다.
-        # Team 모델의 leader, mate1_id, mate2_id, mate3_id, mate4_id 필드를 기준으로 검색합니다.
+        # 로그인한 학생이 속한 팀들을 필터링
+        # Team 모델의 leader, mate1_id, mate2_id, mate3_id, mate4_id 필드를 기준으로 검색
         my_teams = Team.objects.filter(
             Q(leader__student_id=student_id) | # leader는 ForeignKey이므로 leader.student_id로 접근
             Q(mate1_id=student_id) |
