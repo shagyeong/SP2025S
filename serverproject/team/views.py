@@ -72,3 +72,32 @@ class TeamListView(APIView):
     
     def team_view(request):
         return render(request, 'team/team.html')
+
+
+from django.contrib.auth.decorators import login_required # 함수 기반 뷰용
+from rest_framework.permissions import IsAuthenticated # 클래스 기반 뷰용
+from django.db.models import Q # Q 객체 사용
+
+class MyTeamListView(APIView):
+    permission_classes = [IsAuthenticated] # 로그인한 사용자만 접근 가능하도록 설정
+
+    def get(self, request):
+        user = request.user # 현재 로그인한 사용자 객체
+        student_id = user.username # User 모델의 username을 student_id로 사용한다고 가정
+
+        # 로그인한 학생이 속한 팀들을 필터링합니다.
+        # Team 모델의 leader, mate1_id, mate2_id, mate3_id, mate4_id 필드를 기준으로 검색합니다.
+        my_teams = Team.objects.filter(
+            Q(leader__student_id=student_id) | # leader는 ForeignKey이므로 leader.student_id로 접근
+            Q(mate1_id=student_id) |
+            Q(mate2_id=student_id) |
+            Q(mate3_id=student_id) |
+            Q(mate4_id=student_id)
+        ).distinct() # 중복 제거
+
+        if not my_teams.exists():
+            # return Response({"message": "참여 중인 팀이 없습니다."}, status=status.HTTP_200_OK) # 또는 404
+            return Response([], status=status.HTTP_200_OK) # 빈 리스트 반환
+
+        serializer = TeamSerializer(my_teams, many=True)
+        return Response(serializer.data)
