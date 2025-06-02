@@ -7,6 +7,7 @@ class AttendanceSerializer(serializers.ModelSerializer):
         fields = [
             'team_id',
             'round',
+            'at_leader',
             'at_mate1',
             'at_mate2',
             'at_mate3',
