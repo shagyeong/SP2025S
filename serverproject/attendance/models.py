@@ -1,7 +1,8 @@
 from django.db import models
 
 class Attendance(models.Model):
-    team_id = models.CharField(max_length=15, primary_key=True)
+    id = models.AutoField(primary_key=True)  # 기본 키 추가
+    team_id = models.CharField(max_length=15)
     round = models.CharField(max_length=2)
     at_leader = models.CharField(max_length=1, null=True, blank=True)
     at_mate1 = models.CharField(max_length=1, null=True, blank=True)
@@ -14,6 +15,7 @@ class Attendance(models.Model):
         constraints = [
             models.UniqueConstraint(fields=['team_id', 'round'], name='unique_attendance')
         ]
+
 
     def __str__(self):
         return f"{self.team_id} - Round {self.round}"

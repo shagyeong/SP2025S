@@ -9,7 +9,7 @@ urlpatterns = [
     path("instructor/attendance/", views.instructor_attendance, name="instructor_attendance"),
     path("instructor/detail/", views.team_attendance, name="attendance-detail"),
     
-    path('', AttendanceListCreateView.as_view(), name='attendance-create'),
-    path('<str:team_id>/', AttendanceByTeamView.as_view(), name='attendance-by-team'),
-    path('<str:team_id>/round/', AttendanceByRoundView.as_view(), name='attendance-by-round'),
+    path('att/', AttendanceListCreateView.as_view(), name='attendance-create'),
+    path('att/<str:team_id>/', AttendanceByTeamView.as_view(), name='attendance-by-team'),
+    path('att/<str:team_id>/round/', AttendanceByRoundView.as_view(), name='attendance-by-round'),
 ]

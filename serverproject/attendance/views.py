@@ -7,15 +7,49 @@ from .models import Attendance
 from .serializers import AttendanceSerializer
 from django.contrib.auth.decorators import login_required
 from team.models import Team
+from team.models import Student
 
 class AttendanceListCreateView(APIView):
-    """POST /attendance  (출결 기록 추가)"""
-    def post(self, request):
+    def post(self, request, *args, **kwargs):
         serializer = AttendanceSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            attendance = serializer.save()
+
+            team_id = attendance.team_id
+            # leader_id 필드는 ForeignKey이므로 select_related로 객체 가져오기
+            team = Team.objects.select_related('leader').get(team_id=team_id)
+
+            def get_student_name_by_id(student_id):
+                try:
+                    student = Student.objects.get(student_id=student_id)
+                    student_name = student.name  # 'name'은 Student 모델의 필드 이름
+                    return student_name
+                except Student.DoesNotExist:
+                    return None
+            leader_name = get_student_name_by_id(team.leader)
+            mate1_name = get_student_name_by_id(team.mate1_id)
+            mate2_name = get_student_name_by_id(team.mate2_id)
+            mate3_name = get_student_name_by_id(team.mate3_id)
+            mate4_name = get_student_name_by_id(team.mate4_id)
+
+
+            return Response({
+                "message": "출석 등록 완료",
+                "team_id": attendance.team_id,
+                "round": attendance.round,
+                "at_leader": attendance.at_leader,
+                "at_mate1": attendance.at_mate1,
+                "at_mate2": attendance.at_mate2,
+                "at_mate3": attendance.at_mate3,
+                "at_mate4": attendance.at_mate4,
+                "leader_name": leader_name,
+                "mate1_name": mate1_name,
+                "mate2_name": mate2_name,
+                "mate3_name": mate3_name,
+                "mate4_name": mate4_name,
+            }, status=201)
+        else:
+            return Response(serializer.errors, status=400)
 
 class AttendanceByTeamView(APIView):
     """GET /attendance/{team_id}  (특정 팀의 출결 조회)"""
@@ -89,13 +123,13 @@ def attendance_view(request):
     selected_team_id = request.GET.get("team")
     selected_team = team_list.filter(team_id=selected_team_id).first() if selected_team_id else team_list.first()
 
-    return render(request, 'attendance/attendance.html', {
+    return render(request, 'attendance/templates/attendance.html', {
         "teams": team_list,
         "selected_team": selected_team,
     })
 def instructor_attendance(request):
-    return render(request, 'attendance/instructor_attendance.html')
+    return render(request, 'attendance/templates/instructor_attendance.html')
 
 def team_attendance(request):
     rounds = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
-    return render(request, 'attendance/team_attendance.html', {"rounds": rounds})
+    return render(request, 'attendance/templates/team_attendance.html', {"rounds": rounds})

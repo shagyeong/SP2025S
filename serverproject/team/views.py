@@ -7,6 +7,7 @@ from django.shortcuts import get_object_or_404
 from .models import Team
 from .serializers import TeamSerializer
 from .models import Student
+from mainpage.views import create_notion_page
 
 class TeamCreateView(APIView):
     def post(self, request):
