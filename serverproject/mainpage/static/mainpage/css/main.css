@@ -77,32 +77,6 @@ body {
     margin-bottom: 40px;
 }
 
-/* 채팅 */
-.chat-box {
-    height: 200px;
-    overflow-y: auto;
-    border: 1px solid #ddd;
-    padding: 10px;
-}
-
-.input-area {
-    display: flex;
-    margin-top: 10px;
-}
-
-.input-area input {
-    flex: 1;
-    padding: 5px;
-}
-
-.input-area button {
-    padding: 5px 10px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    cursor: pointer;
-}
-
 /* 출결 */
 #attendance-checklist {
     display: flex;

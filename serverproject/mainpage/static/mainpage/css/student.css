@@ -14,28 +14,6 @@ h3::before {
     font-size: 1.1rem;
 }
 
-/* .team-button-list {
-    display: flex;
-    gap: 12px;
-    margin-bottom: 2rem;
-}
-
-.team-button {
-    padding: 10px 18px;
-    border: 1px solid #ccc;
-    background: #f9f9f9;
-    border-radius: 8px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-.team-button:hover,
-.team-button.active {
-    background-color: #007bff;
-    color: white;
-    border-color: #007bff;
-} */
 
 .box {
     background: white;
@@ -63,37 +41,38 @@ h3::before {
     color: #fff;
 }
 
-.team-button-group {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    margin-bottom: 1rem;
-  }
-  .team-button {
-    padding: 0.5rem 1rem;
-    border: 1px solid #ccc;
-    background-color: #f9f9f9;
-    border-radius: 0.5rem;
-    cursor: pointer;
-    transition: background-color 0.3s;
-  }
-  .team-button:hover {
-    background-color: #eef2ff;
-  }
-  .team-button.active {
-    background-color: #3b82f6;
-    color: white;
-    border-color: #3b82f6;
-  }
-  td.present {
-    color: green;
-    text-align: center;
-    font-weight: bold;
-    background-color: #dcfce7;
-  }
-  td.absent {
-    color: red;
-    text-align: center;
-    font-weight: bold;
-    background-color: #fee2e2;
-  }
+.team-button-group { /* 이 스타일은 index.html과 attendance.html 모두 적용 가능 */
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  align-items: center; /* label과 버튼 정렬을 위해 추가 */
+}
+
+/* 팀 버튼 공통 스타일 (button 태그와 a 태그 모두에 적용될 수 있도록) */
+.team-button, /* student.js가 생성하는 버튼용 */
+.team-btn {    /* attendance.html의 a 태그용 (클래스명 통일 권장) */
+  padding: 0.5rem 1rem;
+  border: 1px solid #ccc;
+  background-color: #f9f9f9;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  text-decoration: none; /* a 태그용 */
+  color: #333; /* 기본 글자색 지정 (a 태그 기본색 덮어쓰기) */
+  display: inline-block; /* a 태그를 버튼처럼 */
+  font-size: 0.9rem; /* ★★★ 폰트 크기를 명시적으로 지정 (예시) ★★★ */
+  /* 필요하다면 line-height, font-weight 등도 통일 */
+}
+
+.team-button:hover,
+.team-btn:hover {
+  background-color: #eef2ff;
+}
+
+.team-button.active,
+.team-btn.active {
+  background-color: #3b82f6;
+  color: white;
+  border-color: #3b82f6;
+}
