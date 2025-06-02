@@ -1,31 +1,45 @@
 {% extends "mainpage/base.html" %}
+{% load static %}
+
 {% block title %}공유 문서{% endblock %}
 
 {% block content %}
 <div class="container">
   <h2>📄 팀별 공유 문서</h2>
 
-  <form method="get" style="margin-bottom: 1rem;">
-    <label for="team">팀 선택:</label>
-    <select name="team" id="team" onchange="this.form.submit()">
-      {% for team in teams %}
-        <option value="{{ team.team_id }}" {% if team.team_id == selected_team.team_id %}selected{% endif %}>
-          {{ team.team_name }}
-        </option>
-      {% endfor %}
-    </select>
-  </form>
+  <div class="team-button-group">
+    <label>팀 선택:</label>
+    {% if not teams %}
+        <span>참여 중인 팀이 없습니다.</span>
+    {% else %}
+        {% for team_item in teams %}
+            {# 공통 버튼 클래스 'team-select-button' 사용 (예시) #}
+            <a href="?team={{ team_item.team_id }}"
+               class="team-select-button {% if selected_team and team_item.team_id == selected_team.team_id %}active{% endif %}">
+                {{ team_item.team_name|default:team_item.team_id }}
+            </a>
+        {% endfor %}
+    {% endif %}
+  </div>
 
   {% if iframe_url %}
-    <div class="notion-preview-card" style="padding: 1rem; background: #f9f9f9; border: 1px solid #ddd; border-radius: 10px;">
-      <h3 style="margin-bottom: 0.5rem;">🔗 {{ selected_team.team_name }} 문서</h3>
-      <p style="margin-bottom: 1rem; color: #555;">아래 버튼을 클릭하여 문서를 편집하세요.</p>
-      <a href="{{ iframe_url }}" target="_blank" class="btn btn-primary" style="padding: 0.5rem 1rem; border-radius: 5px; background-color: #3f51b5; color: white; text-decoration: none;">
+    <div class="notion-preview-card">
+      <h3><span class="icon">🔗</span> {{ selected_team.team_name }} 문서</h3> {# 아이콘을 span으로 감싸서 스타일링 용이하게 #}
+      <p>아래 버튼을 클릭하여 Notion에서 문서를 확인하고 편집하세요.</p>
+      <a href="{{ iframe_url }}" target="_blank" class="btn-notion-link">
         Notion 문서 열기
       </a>
     </div>
   {% else %}
-    <p>⚠️ 선택한 팀에 연결된 문서가 없습니다.</p>
+    {% if selected_team %}
+        <div class="notion-preview-card" style="background-color: #FFFBEB; border-color: #FDE68A;"> {# 경고 메시지 카드 스타일 #}
+            <h3 style="color: #CA8A04;"><span class="icon">⚠️</span> 문서 없음</h3>
+            <p><strong>{{ selected_team.team_name }}</strong> 팀의 공유 문서(Notion 링크)가 아직 설정되지 않았습니다.</p>
+            <p><small>관리자 또는 팀 리더에게 문의하거나, 팀 생성 시 Notion 페이지가 자동으로 생성되었는지 확인해주세요.</small></p>
+        </div>
+    {% else %}
+        <p>먼저 위에서 팀을 선택해주세요.</p>
+    {% endif %}
   {% endif %}
 </div>
 {% endblock %}

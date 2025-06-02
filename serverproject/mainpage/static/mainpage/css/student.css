@@ -41,38 +41,195 @@ h3::before {
     color: #fff;
 }
 
-.team-button-group { /* 이 스타일은 index.html과 attendance.html 모두 적용 가능 */
+/* 팀 선택 버튼 그룹 스타일 */
+.team-button-group {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-bottom: 1rem;
-  align-items: center; /* label과 버튼 정렬을 위해 추가 */
+  gap: 0.6rem;
+  margin-bottom: 1.5rem;
+  align-items: center;
+}
+.team-button-group > label { 
+  font-weight: 500;
+  color: #4A5568;
+  margin-right: 0.5rem;
 }
 
-/* 팀 버튼 공통 스타일 (button 태그와 a 태그 모두에 적용될 수 있도록) */
-.team-button, /* student.js가 생성하는 버튼용 */
-.team-btn {    /* attendance.html의 a 태그용 (클래스명 통일 권장) */
-  padding: 0.5rem 1rem;
-  border: 1px solid #ccc;
-  background-color: #f9f9f9;
-  border-radius: 0.5rem;
+
+#team-buttons { /* student.js가 버튼을 채우는 div */
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem; /* 개별 버튼 사이의 간격 */
+}
+
+.team-button { /* student.js가 생성하는 button 요소에 적용될 클래스 */
+  padding: 0.6rem 1rem;
+  border: 1px solid #D1D5DB; /* Tailwind gray-300 */
+  background-color: #F9FAFB; /* Tailwind gray-50 */
+  border-radius: 0.375rem; /* 6px */
   cursor: pointer;
-  transition: background-color 0.3s;
-  text-decoration: none; /* a 태그용 */
-  color: #333; /* 기본 글자색 지정 (a 태그 기본색 덮어쓰기) */
-  display: inline-block; /* a 태그를 버튼처럼 */
-  font-size: 0.9rem; /* ★★★ 폰트 크기를 명시적으로 지정 (예시) ★★★ */
-  /* 필요하다면 line-height, font-weight 등도 통일 */
+  transition: all 0.2s ease-in-out;
+  color: #374151; /* Tailwind gray-700 */
+  font-size: 0.9rem;
+  font-weight: 500;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
 }
 
-.team-button:hover,
-.team-btn:hover {
-  background-color: #eef2ff;
+.team-button:hover {
+  background-color: #F3F4F6; /* Tailwind gray-100 */
+  border-color: #9CA3AF; /* Tailwind gray-400 */
 }
 
-.team-button.active,
-.team-btn.active {
-  background-color: #3b82f6;
+.team-button.active {
+  background-color: #3B82F6; /* Tailwind blue-500 */
   color: white;
-  border-color: #3b82f6;
+  border-color: #2563EB; /* Tailwind blue-600 */
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+}
+
+
+.box h3 { /* 각 박스 제목 스타일 */
+  font-size: 1.125rem; /* 18px */
+  color: #1F2937; /* Tailwind gray-800 */
+  margin-bottom: 1rem; /* 제목과 내용 사이 간격 */
+  display: flex; /* 아이콘과 텍스트 정렬을 위해 */
+  align-items: center;
+}
+
+.box h3 .icon { /* 제목 옆 아이콘 스타일 */
+  margin-right: 0.5rem;
+  font-size: 1.2em; /* 아이콘 크기를 폰트 크기에 비례하도록 */
+  line-height: 1;
+}
+
+.box p { /* 박스 내 일반 텍스트 */
+  color: #4B5563; /* Tailwind gray-600 */
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+#team-members p,
+#team-documents p,
+#team-attendance-summary p {
+  margin-top: 0; /* 초기 메시지 등의 상단 마진 제거 */
+}
+
+
+/* Notion 문서 열기 버튼 스타일 (student.js에서 생성하는 버튼용) */
+.btn-notion-link {
+  display: inline-block;
+  padding: 0.6rem 1.2rem;
+  border-radius: 0.375rem; /* 6px */
+  background-color: #374151; /* 어두운 회색 계열 (Notion 느낌) */
+  color: white !important; /* 글자색 흰색, !important로 a 태그 기본색 덮어쓰기 */
+  text-decoration: none !important; /* 밑줄 제거, !important로 a 태그 기본 밑줄 덮어쓰기 */
+  font-weight: 500;
+  font-size: 0.9rem;
+  transition: background-color 0.2s ease-in-out;
+  border: 1px solid transparent;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  margin-top: 0.5rem;
+}
+
+.btn-notion-link:hover {
+  background-color: #1F2937; /* 호버 시 더 어둡게 */
+  color: white !important; /* 호버 시에도 글자색 흰색 유지 */
+  text-decoration: none !important; /* 호버 시에도 밑줄 제거 유지 */
+}
+
+/* .btn-link 와의 일관성을 위한 추가 (선택 사항) */
+.btn-link {
+  font-size: 0.9rem; /* 다른 버튼들과 폰트 크기 맞춤 */
+}
+
+/* 테이블 스타일 (main.css에도 유사한 정의가 있을 수 있으므로 필요시 main.css 수정) */
+.attendance-table { /* index.html의 출결 요약 테이블용 */
+  width: 100%;
+  margin-top: 0.5rem;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+.attendance-table th,
+.attendance-table td {
+  border: 1px solid #E5E7EB; /* Tailwind gray-200 */
+  padding: 0.6rem 0.8rem;
+  text-align: left;
+}
+.attendance-table th {
+  background-color: #F9FAFB; /* Tailwind gray-50 */
+  font-weight: 500;
+  color: #374151; /* Tailwind gray-700 */
+}
+
+/* Notion 미리보기 카드 스타일 */
+.notion-preview-card {
+  padding: 1.5rem;
+  background: #ffffff;
+  border: 1px solid #E5E7EB;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.07), 0 1px 2px -1px rgba(0, 0, 0, 0.04);
+  margin-top: 1rem; /* 팀 선택 UI와의 간격 */
+}
+.notion-preview-card h3 {
+  margin-top: 0;
+  margin-bottom: 0.75rem;
+  font-size: 1.125rem;
+  color: #1F2937;
+  display: flex; /* 아이콘 정렬을 위해 */
+  align-items: center;
+}
+.notion-preview-card h3 .icon { /* 🔗 아이콘 스타일 */
+  margin-right: 0.5rem;
+  font-size: 1.1em; /* 아이콘 크기 */
+}
+.notion-preview-card p {
+  margin-bottom: 1.25rem;
+  color: #4B5563;
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+/* Notion 문서 열기 버튼 스타일 */
+.btn-notion-link {
+  display: inline-block;
+  padding: 0.7rem 1.3rem; /* 패딩 약간 증가 */
+  border-radius: 0.375rem; /* 6px */
+  background-color: #374151; /* 어두운 회색 계열, Notion과 유사하게 */
+  color: white !important; /* 글자색 흰색, 다른 a 태그 스타일 덮어쓰기 */
+  text-decoration: none !important; /* 밑줄 제거 */
+  font-weight: 500;
+  font-size: 0.95rem; /* 약간 크게 */
+  transition: background-color 0.2s ease-in-out;
+  border: none; /* 테두리 없음 */
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* 약간의 그림자 */
+}
+.btn-notion-link:hover {
+  background-color: #1F2937; /* 호버 시 더 어둡게 */
+  color: white !important;
+}
+
+/* 팀 선택 버튼 (a 태그 또는 button 태그 공용으로 사용할 수 있는 클래스) */
+.team-select-button { 
+  padding: 0.6rem 1rem;
+  border: 1px solid #D1D5DB;
+  background-color: #F9FAFB;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  text-decoration: none;
+  color: #374151;
+  font-size: 0.9rem;
+  font-weight: 500;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  display: inline-block; /* a 태그를 버튼처럼 보이게 */
+}
+.team-select-button:hover {
+  background-color: #F3F4F6;
+  border-color: #9CA3AF;
+}
+.team-select-button.active {
+  background-color: #3B82F6;
+  color: white;
+  border-color: #2563EB;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
 }

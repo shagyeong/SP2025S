@@ -6,17 +6,14 @@ let currentTeamId = null;
 document.addEventListener("DOMContentLoaded", function () {
     console.log("🎓 Student JS Loaded");
 
-    // 로그인한 학생의 팀 목록 불러오기
-    fetch('/api/my_teams/') // API URL 변경
+    fetch('/api/my_teams/')
         .then(res => {
             if (!res.ok) {
-                // 401 Unauthorized 또는 403 Forbidden 등의 오류 처리 가능
                 if (res.status === 401 || res.status === 403) {
                     console.warn("팀 목록 접근 권한이 없습니다. 로그인이 필요할 수 있습니다.");
-                    // 로그인 페이지로 리디렉션하거나 사용자에게 알림
                     const teamContainer = document.getElementById("team-buttons");
                     if (teamContainer) teamContainer.innerHTML = "<p>팀 목록을 보려면 로그인이 필요합니다.</p>";
-                    return Promise.reject(new Error('Authentication required')); // 이후 .then 실행 방지
+                    return Promise.reject(new Error('Authentication required'));
                 }
                 throw new Error(`Network response was not ok: ${res.statusText}`);
             }
@@ -32,7 +29,6 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         })
         .catch(error => {
-            // Authentication required 에러는 이미 위에서 처리했을 수 있으므로 중복 알림 방지
             if (error.message !== 'Authentication required') {
                 console.error('Error fetching my team list in student.js:', error);
                 const teamContainer = document.getElementById("team-buttons");
@@ -48,48 +44,57 @@ function renderTeamButtons(teams) {
         console.error("Element with ID 'team-buttons' not found.");
         return;
     }
-    teamContainer.innerHTML = "";
+    teamContainer.innerHTML = ""; // 초기 "로딩 중..." 메시지 제거
 
-    if (!teams || !Array.isArray(teams)) {
-        console.error("Invalid 'teams' data passed to renderTeamButtons:", teams);
-        teamContainer.innerHTML = "<p>팀 정보를 표시할 수 없습니다.</p>";
+    if (!teams || !Array.isArray(teams) || teams.length === 0) { // 팀이 없는 경우도 처리
+        console.info("참여 중인 팀이 없습니다.");
+        teamContainer.innerHTML = "<p>참여 중인 팀이 없습니다.</p>";
+        // 팀이 없으면 기본 정보 초기화
+        if (typeof renderTeamInfo === 'function') renderTeamInfo(null);
+        if (typeof renderTeamDocuments === 'function') renderTeamDocuments(null);
         return;
     }
 
     teams.forEach(team => {
-        // TeamListView 응답에는 team_id와 team_name이 있으므로 유효성 검사 기준에 맞음
         if (!team || typeof team.team_id === 'undefined' || typeof team.team_name === 'undefined') {
             console.warn("Skipping invalid team data:", team);
             return;
         }
         const btn = document.createElement("button");
         btn.textContent = team.team_name;
-        btn.classList.add("team-button");
+        btn.classList.add("team-button"); // student.css에 정의된 스타일 적용
         btn.onclick = () => {
             currentTeamId = team.team_id;
             document.querySelectorAll('.team-button').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
 
-            // 이 함수들이 student.js 또는 다른 로드된 js에 정의되어 있는지 확인
             if (typeof loadTeamInfo === 'function') loadTeamInfo(team.team_id);
-            // if (typeof fetchChatMessages === 'function') fetchChatMessages();
+            if (typeof fetchAndRenderAttendanceSummary === 'function') {
+                fetchAndRenderAttendanceSummary(team.team_id);
+            }
         };
         teamContainer.appendChild(btn);
     });
 
     if (teams.length > 0 && teamContainer.querySelector(".team-button")) {
+        // 첫 번째 팀을 자동으로 클릭 (이때 fetchAndRenderAttendanceSummary도 호출됨)
         teamContainer.querySelector(".team-button").click();
     } else if (teams.length === 0) {
         teamContainer.innerHTML = "<p>참여 중인 팀이 없습니다.</p>";
+        if (typeof renderTeamInfo === 'function') renderTeamInfo(null);
+        if (typeof renderTeamDocuments === 'function') renderTeamDocuments(null);
+        if (typeof fetchAndRenderAttendanceSummary === 'function') fetchAndRenderAttendanceSummary(null); // 팀 없을 때 초기화
     }
 }
 
 function loadTeamInfo(teamId) {
-    // TeamDetailView API 경로를 사용합니다.
+    // 로딩 중 표시 (선택 사항)
+    const teamDocumentsDiv = document.getElementById("team-documents");
+    if (teamDocumentsDiv) teamDocumentsDiv.innerHTML = "<p>문서 정보 로딩 중...</p>";
+
     fetch(`/api/teams/${teamId}`) // TeamSerializer를 사용하는 API
         .then(res => {
             if (!res.ok) {
-                // 404 (Not Found) 등의 오류를 좀 더 구체적으로 처리할 수 있습니다.
                 if (res.status === 404) {
                     throw new Error(`Team with ID ${teamId} not found.`);
                 }
@@ -97,33 +102,80 @@ function loadTeamInfo(teamId) {
             }
             return res.json();
         })
-        .then(teamData => { // API는 단일 팀 객체를 반환합니다.
+        .then(teamData => {
             if (typeof renderTeamInfo === 'function') {
-                renderTeamInfo(teamData); // 팀 정보를 렌더링하는 함수에 전체 팀 데이터 전달
+                renderTeamInfo(teamData);
             }
-
-            // TeamSerializer는 문서(documents)나 출결(attendance) 정보를 포함하지 않습니다.
-            // 따라서 이 정보들은 별도의 API 호출을 통해 가져와야 합니다.
-            // 만약 해당 기능이 필요하다면, 관련 API와 fetch 함수를 만들어야 합니다.
-            // 예시:
-            // if (typeof fetchTeamDocumentsForStudentPage === 'function') fetchTeamDocumentsForStudentPage(teamId);
-            // if (typeof fetchTeamAttendanceForStudentPage === 'function') fetchTeamAttendanceForStudentPage(teamId);
-
-            // 아래는 주석 처리 (TeamSerializer에 해당 정보가 없으므로)
-            // renderTeamDocuments(teamData.documents || []); // TeamSerializer에 documents 필드 없음
-            // renderAttendance(teamData.attendance || []);   // TeamSerializer에 attendance 필드 없음
+            if (typeof renderTeamDocuments === 'function') {
+                renderTeamDocuments(teamData.notion_url, teamData.team_name); // 팀 이름도 전달 (버튼 텍스트용)
+            }
         })
         .catch(error => {
             console.error(`Error loading team info for ${teamId}:`, error);
-            // 사용자에게 오류 메시지를 표시할 수 있습니다.
             const teamNameElement = document.getElementById("team-name");
             if (teamNameElement) teamNameElement.textContent = "팀 정보를 불러올 수 없습니다.";
             const teamMembersElement = document.getElementById("team-members");
-            if (teamMembersElement) teamMembersElement.innerHTML = "";
+            if (teamMembersElement) teamMembersElement.innerHTML = "<p>팀 정보를 불러오는 중 오류가 발생했습니다.</p>";
+            if (teamDocumentsDiv) teamDocumentsDiv.innerHTML = "<p>문서 정보를 불러오는 중 오류가 발생했습니다.</p>";
         });
 }
+async function fetchAndRenderAttendanceSummary(teamId) {
+    const summaryContainer = document.getElementById("team-attendance-summary");
+    if (!summaryContainer) {
+        console.warn("Element with ID 'team-attendance-summary' not found.");
+        return;
+    }
 
-function renderTeamInfo(team) { // team은 수정된 TeamSerializer로부터 온 객체
+    if (!teamId) {
+        summaryContainer.innerHTML = "<p>팀을 선택해주세요.</p>";
+        return;
+    }
+
+    summaryContainer.innerHTML = "<p>출결 요약 정보 로딩 중...</p>";
+
+    try {
+        const response = await fetch(`/api/attendance/att/summary/${teamId}/`); // 실제 API 경로 확인
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            if (response.status === 404) {
+                summaryContainer.innerHTML = `<p>${errorData.error || '출결 요약 정보를 찾을 수 없습니다.'}</p>`;
+            } else if (response.status === 403) {
+                 summaryContainer.innerHTML = `<p>${errorData.detail || '이 팀의 출결 요약 정보에 접근할 권한이 없습니다.'}</p>`;
+            }
+            else {
+                throw new Error(`서버 응답 오류: ${response.status} ${errorData.error || ''}`);
+            }
+            return;
+        }
+        const summaryData = await response.json();
+
+        if (summaryData && summaryData.message && summaryData.message.includes("멤버가 아닙니다")) {
+             // 팀 멤버가 아닌 경우 서버에서 보낸 메시지 표시
+             summaryContainer.innerHTML = `<p>${summaryData.message}</p>`;
+        } else if (summaryData && summaryData.message && summaryData.message.includes("기록이 아직 없습니다")) {
+             // 팀 출결 기록이 없는 경우
+             summaryContainer.innerHTML = `<p>${summaryData.message}</p>`;
+        }
+        else if (summaryData && typeof summaryData.present_count !== 'undefined' && summaryData.user_student_name) {
+            summaryContainer.innerHTML = `
+                <p style="font-weight: 500; margin-bottom: 0.5rem;">${summaryData.user_student_name}님의 출결 현황 (${summaryData.team_name || teamId} 팀)</p>
+                <ul style="list-style-type: none; padding-left: 0; margin-top: 0.5rem;">
+                    <li style="margin-bottom: 0.25rem;">총 출석: <strong style="color: #10B981;">${summaryData.present_count}회</strong></li>
+                    <li style="margin-bottom: 0.25rem;">총 결석: <strong style="color: #EF4444;">${summaryData.absent_count}회</strong></li>
+                </ul>
+                <p style="font-size: 0.8rem; color: #6B7280; margin-top: 0.5rem;">(총 ${summaryData.total_sessions_for_member || 'N/A'}회차 기록 기준)</p>
+            `;
+        } else {
+            summaryContainer.innerHTML = "<p>출결 요약 정보가 없거나 형식이 올바르지 않습니다.</p>";
+        }
+
+    } catch (error) {
+        console.error(`Error fetching attendance summary for team ${teamId}:`, error);
+        summaryContainer.innerHTML = "<p>출결 요약 정보를 불러오는 중 오류가 발생했습니다.</p>";
+    }
+}
+
+function renderTeamInfo(team) {
     const teamNameElement = document.getElementById("team-name");
     const teamMembersElement = document.getElementById("team-members");
 
@@ -132,9 +184,9 @@ function renderTeamInfo(team) { // team은 수정된 TeamSerializer로부터 온
         return;
     }
 
-    if (!team || typeof team.team_name === 'undefined') {
-        teamNameElement.textContent = "팀 정보 없음";
-        teamMembersElement.innerHTML = "";
+    if (!team || typeof team.team_name === 'undefined') { // 팀 정보가 null이거나 없을 경우
+        teamNameElement.textContent = "👥 팀 정보"; // 기본 제목
+        teamMembersElement.innerHTML = "<p>팀을 선택해주세요.</p>";
         return;
     }
 
@@ -148,7 +200,6 @@ function renderTeamInfo(team) { // team은 수정된 TeamSerializer로부터 온
     }
 
     const mates = [];
-    // TeamSerializer가 mateX_name을 포함한다고 가정
     if (team.mate1_name) mates.push(`${team.mate1_name} (${team.mate1_id || 'ID 없음'})`);
     else if (team.mate1_id) mates.push(`팀원1 ID: ${team.mate1_id}`);
 
@@ -166,55 +217,49 @@ function renderTeamInfo(team) { // team은 수정된 TeamSerializer로부터 온
     } else {
         membersHtml += `<p>팀원이 아직 없습니다.</p>`;
     }
-
     teamMembersElement.innerHTML = membersHtml;
 }
 
-// renderTeamDocuments 함수는 TeamSerializer에 문서 정보가 없으므로,
-// 이 함수를 호출하는 부분(loadTeamInfo)에서 주석 처리하거나,
-// 문서 정보를 가져오는 별도의 API를 호출하도록 수정해야 합니다.
-// 아래 함수는 그대로 두지만, 실제 데이터 소스를 고려해야 합니다.
-function renderTeamDocuments(documents) {
-    const list = document.getElementById("team-documents");
-    if (!list) return;
-    list.innerHTML = "";
-
-    if (!documents || documents.length === 0) {
-        list.innerHTML = "<p>📂 공유 문서가 없습니다.</p>";
+function renderTeamDocuments(notionUrl, teamName = "팀") {
+    const documentsDiv = document.getElementById("team-documents");
+    if (!documentsDiv) {
+        console.error("Element with ID 'team-documents' not found.");
         return;
     }
+    documentsDiv.innerHTML = ""; // 기존 내용 비우기
 
-    documents.forEach(doc => {
-        const card = document.createElement("div");
-        card.classList.add("notion-card"); // CSS 클래스 확인 필요
-        card.innerHTML = `
-            <div class="notion-title">${doc.title || '제목 없음'}</div>
-            <div class="notion-meta">상태: ${doc.status || '상태 모름'}</div>
-        `;
-        list.appendChild(card);
-    });
+    if (notionUrl) {
+        const p = document.createElement("p"); 
+        p.textContent = "팀의 공유 문서를 확인하고 협업하세요."; // 버튼 위에 설명 추가
+        p.style.marginBottom = "0.75rem"; // 버튼과의 간격
+        documentsDiv.appendChild(p);
+
+        const notionLink = document.createElement("a");
+        notionLink.href = notionUrl;
+        notionLink.target = "_blank";
+        notionLink.classList.add("btn-notion-link");
+        notionLink.textContent = `${teamName} Notion 문서 열기`;
+        documentsDiv.appendChild(notionLink);
+
+    } else if (notionUrl === null || notionUrl === '') {
+        documentsDiv.innerHTML = "<p>📂 이 팀의 공유 문서(Notion 링크)가 아직 설정되지 않았습니다.</p>";
+    } else {
+        documentsDiv.innerHTML = "<p>팀을 선택하면 공유 문서 정보를 표시합니다.</p>";
+    }
 }
 
-// renderAttendance 함수도 TeamSerializer에 출결 정보가 없으므로,
-// 이 함수를 호출하는 부분(loadTeamInfo)에서 주석 처리하거나,
-// 출결 정보를 가져오는 별도의 API를 호출하도록 수정해야 합니다.
-// 아래 함수는 그대로 두지만, 실제 데이터 소스를 고려해야 합니다.
-function renderAttendance(attendance) {
-    const container = document.getElementById("team-attendance");
-    if (!container) return;
+function renderAttendance(attendanceSummary) {
+    const container = document.getElementById("team-attendance-summary"); // HTML의 ID와 일치시킴
+    if (!container) {
+        // console.error("Element with ID 'team-attendance-summary' not found."); // 이 페이지에 해당 요소가 없다면 오류 발생 가능
+        return;
+    }
+    container.innerHTML = ""; // 초기화
 
-    if (!attendance || attendance.length === 0) {
-        container.innerHTML = "<p>📅 출결 기록이 없습니다.</p>";
+    if (!attendanceSummary) { // 팀 선택 전 또는 데이터 로딩 실패 시
+        container.innerHTML = "<p>팀을 선택하면 출결 요약 정보를 표시합니다.</p>";
         return;
     }
 
-    let html = "<table class='attendance-table'><thead><tr><th>회차</th><th>이름</th><th>출결</th></tr></thead><tbody>";
-    attendance.forEach(row => {
-        const statusIcon = row.status === '출석' // '출석'이라는 값이 정확한지 확인 필요
-            ? '<span class="dot green"></span> 출석'
-            : '<span class="dot red"></span> 결석'; // '결석' 외 다른 상태(지각 등)도 고려
-        html += `<tr><td>${row.round || '-'}</td><td>${row.name || '-'}</td><td>${statusIcon}</td></tr>`;
-    });
-    html += "</tbody></table>";
-    container.innerHTML = html;
+    container.innerHTML = "<p>📅 (출결 요약 정보 표시 영역 - API 구현 필요)</p>"; // 임시 메시지
 }
