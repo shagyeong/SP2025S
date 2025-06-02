@@ -1,50 +1,305 @@
-<!-- 학생용 출결 확인 페이지 -->
-
+<!-- serverproject/attendance/templates/attendance/attendance.html -->
 {% extends "mainpage/base.html" %}
 {% load static %}
 
+{% block extra_css %}
+    {{ block.super }}
+    <script id="team-members-data" type="application/json">
+        {{ team_members_json|safe|default_if_none:'[]' }}
+    </script>
+    <script id="current-round-data" type="application/json">
+        {{ current_round_info_json|safe|default_if_none:'{"number": "01", "displayName": "1회차"}' }}
+    </script>
+    <script id="selected-team-id-data" type="application/json">
+        {% if selected_team %}"{{ selected_team.team_id }}"{% else %}null{% endif %}
+    </script>
+    <style>
+      /* 팀 선택 버튼 그룹 스타일 (기존 스타일 참고 또는 student.css에서 가져옴) */
+      .team-button-group {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 0.6rem; /* 간격 약간 조정 */
+          margin-bottom: 1.5rem; /* 하단 여백 증가 */
+          align-items: center;
+      }
+      .team-button-group label { /* "팀 선택:" 레이블 스타일 */
+          font-weight: 500;
+          color: #4A5568; /* Tailwind gray-700 */
+          margin-right: 0.5rem;
+      }
+      .team-button-group .team-btn { /* 팀 선택 버튼 (a 태그) */
+          padding: 0.6rem 1rem; /* 패딩 조정 */
+          border: 1px solid #D1D5DB; /* Tailwind gray-300 */
+          background-color: #F9FAFB; /* Tailwind gray-50 */
+          border-radius: 0.375rem; /* 6px */
+          cursor: pointer;
+          transition: all 0.2s ease-in-out;
+          text-decoration: none;
+          color: #374151; /* Tailwind gray-700 */
+          font-size: 0.9rem;
+          font-weight: 500;
+          box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      }
+      .team-button-group .team-btn:hover {
+          background-color: #F3F4F6; /* Tailwind gray-100 */
+          border-color: #9CA3AF; /* Tailwind gray-400 */
+      }
+      .team-button-group .team-btn.active {
+          background-color: #3B82F6; /* Tailwind blue-500 */
+          color: white;
+          border-color: #2563EB; /* Tailwind blue-600 */
+          box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+      }
+
+      /* --- ▼▼▼ 출결 확인 섹션 UI 개선 (팀 선택 버튼과 유사한 스타일) ▼▼▼ --- */
+      #attendance-checklist {
+          display: flex;
+          flex-direction: column;
+          gap: 0.6rem; /* 팀원 항목 간 간격 */
+      }
+
+      .team-member-attendance-item {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 0.8rem 0; /* 패딩 조정 */
+          border-bottom: 1px solid #E5E7EB; /* Tailwind gray-200 */
+      }
+      .team-member-attendance-item:last-child {
+          border-bottom: none;
+      }
+
+      .team-member-attendance-item .member-name {
+          font-weight: 500;
+          color: #1F2937; /* Tailwind gray-800, 더 진하게 */
+          flex-basis: 45%; /* 이름 영역 너비 조정 */
+          margin-right: 1rem;
+          font-size: 0.95rem;
+      }
+
+      .team-member-attendance-item .status-options {
+          display: flex;
+          gap: 0.6rem; /* 버튼 사이 간격 */
+          flex-basis: 50%; /* 버튼 영역 너비 조정 */
+          justify-content: flex-start;
+      }
+
+      .team-member-attendance-item .status-options label {
+          padding: 0.6rem 0.9rem; /* 버튼 패딩 */
+          border: 1px solid #D1D5DB; /* 기본 테두리 (Tailwind gray-300) */
+          border-radius: 0.375rem; /* 6px */
+          cursor: pointer;
+          transition: all 0.2s ease-in-out;
+          text-align: center;
+          font-weight: 500;
+          font-size: 0.875rem; /* 14px */
+          background-color: #F9FAFB; /* 기본 배경 (Tailwind gray-50) */
+          color: #374151; /* 기본 텍스트 (Tailwind gray-700) */
+          box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+          min-width: 75px; /* 최소 너비 */
+      }
+
+      .team-member-attendance-item .status-options input[type="radio"] {
+          display: none; /* 실제 라디오 버튼 숨김 */
+      }
+
+      /* 출석 버튼 스타일 */
+      /* 기본 상태는 label 공통 스타일 사용, 선택 시 .selected 클래스로 변경 */
+      .team-member-attendance-item .status-options label.status-present-label:not(.selected):hover {
+          background-color: #ECFDF5; /* Tailwind green-50 (더 연하게) */
+          border-color: #A7F3D0; /* Tailwind green-200 */
+          color: #065F46; /* Tailwind green-800 */
+      }
+      .team-member-attendance-item .status-options label.status-present-label.selected {
+          background-color: #10B981; /* Tailwind green-500 */
+          color: white;
+          border-color: #059669; /* Tailwind green-600 */
+          font-weight: 500; /* 선택 시 폰트 두께는 공통 label과 동일하게 */
+      }
+
+      /* 결석 버튼 스타일 */
+      .team-member-attendance-item .status-options label.status-absent-label:not(.selected):hover {
+          background-color: #FFF1F2; /* Tailwind red-50 (더 연하게) */
+          border-color: #FECACA; /* Tailwind red-200 */
+          color: #991B1B; /* Tailwind red-800 */
+      }
+      .team-member-attendance-item .status-options label.status-absent-label.selected {
+          background-color: #EF4444; /* Tailwind red-500 */
+          color: white;
+          border-color: #DC2626; /* Tailwind red-600 */
+          font-weight: 500;
+      }
+
+      /* "출석 완료" 버튼 (기존 스타일과 유사하게 유지 또는 팀 선택 버튼과 통일) */
+      #submit-attendance {
+          margin-top: 1.5rem;
+          padding: 0.7rem 1.3rem; /* 패딩 약간 증가 */
+          background-color: #3B82F6; /* 팀 선택 활성 버튼과 동일한 파란색 */
+          color: white;
+          border: none;
+          border-radius: 0.375rem;
+          cursor: pointer;
+          font-size: 0.95rem;
+          font-weight: 500;
+          transition: background-color 0.2s;
+          box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+      }
+      #submit-attendance:hover {
+          background-color: #2563EB; /* 더 진한 파란색 */
+      }
+
+      /* 타임스탬프 (기존 스타일 유지) */
+      #attendance-timestamp {
+          margin-top: 0.8rem;
+          font-size: 0.85rem;
+          color: #6B7280; /* Tailwind gray-500 */
+      }
+      /* --- ▲▲▲ 출결 확인 섹션 UI 개선 CSS ▲▲▲ --- */
+
+      /* 출결 기록 테이블 셀 스타일 (기존 스타일 유지) */
+      td.present {
+          color: #15803D; /* Tailwind green-700 */
+          text-align: center;
+          font-weight: 500; /* 약간 얇게 */
+          background-color: #F0FDF4; /* Tailwind green-50 */
+      }
+      td.absent {
+          color: #B91C1C; /* Tailwind red-700 */
+          text-align: center;
+          font-weight: 500;
+          background-color: #FEF2F2; /* Tailwind red-50 */
+      }
+
+      .round-selector-form {
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .round-selector-form label {
+            font-weight: 500;
+            color: #4A5568;
+        }
+        .round-selector-form select {
+            padding: 0.5rem 0.8rem;
+            border: 1px solid #D1D5DB;
+            border-radius: 0.375rem;
+            background-color: white;
+            font-size: 0.9rem;
+        }
+  </style>
+{% endblock %}
+
 {% block content %}
-<div class="container" data-team-id="{{ selected_team.team_id }}">
-    <form method="get" style="margin-bottom: 1rem;">
-      <label for="team">팀 선택:</label>
-      <select name="team" id="team" onchange="this.form.submit()">
-        {% for team in teams %}
-          <option value="{{ team.team_id }}" {% if team.team_id == selected_team.team_id %}selected{% endif %}>{{ team.team_name }}</option>
-        {% endfor %}
-      </select>
-    </form>
-    <!-- 오늘의 출결 확인 -->
+<div class="container">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <div class="team-button-group">
+            <label style="margin-right: 0.5rem;">팀 선택:</label>
+            {% if not teams %}
+                <span>참여 중인 팀이 없습니다.</span>
+            {% else %}
+                {% for team_item in teams %}
+                    <a href="?team={{ team_item.team_id }}{% if request.GET.round %}&round={{ request.GET.round }}{% endif %}"
+                       class="team-btn {% if selected_team and team_item.team_id == selected_team.team_id %}active{% endif %}">
+                        {{ team_item.team_name|default:team_item.team_id }}
+                    </a>
+                {% endfor %}
+            {% endif %}
+        </div>
+
+        {% if selected_team %}
+        <form method="get" class="round-selector-form" id="round-select-form">
+            <input type="hidden" name="team" value="{{ selected_team.team_id }}">
+            <label for="round_selector">회차 선택:</label>
+            <select name="round" id="round_selector" onchange="this.form.submit()">
+                {# JavaScript가 여기에 옵션을 채웁니다. #}
+                <option value="">로딩 중...</option>
+            </select>
+        </form>
+        {% endif %}
+    </div>
+
+    {% if selected_team %}
     <section class="attendance-section">
-        <h2>출결 확인</h2>
+        <h2>
+            출결 확인 - <span id="team-name-display">{{ selected_team.team_name|default:selected_team.team_id }}</span>
+        </h2>
         <div class="attendance-today">
-            <h3>오늘</h3>
-            <div id="attendance-checklist">
-                <!-- JS로 팀원별 체크박스 삽입 -->
-            </div>
+            <h3 id="current-session-name-display"></h3> {# JS가 채움 #}
+            <div id="attendance-checklist"></div>
             <button id="submit-attendance">출석 완료</button>
             <p id="attendance-timestamp">타임스탬프: -</p>
         </div>
     </section>
 
-    <!-- 회차별 출결 기록 조회 (flatpickr 제거 → 전체 회차 표시) -->
     <section class="attendance-history">
         <h2>회차별 출결 기록</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>회차</th>
-                    <th>역할</th>
-                    <th>출결</th>
-                </tr>
-            </thead>
-            <tbody id="history-list">
-                <!-- 전체 회차 출결 기록이 여기에 표시됨 -->
-            </tbody>
+        <table id="attendance-history-table">
+            <thead id="history-table-head"></thead>
+            <tbody id="history-table-body"></tbody>
         </table>
     </section>
+    {% else %}
+        <p>표시할 팀 정보가 없습니다. 팀을 선택하거나 팀에 참여해주세요.</p>
+    {% endif %}
 </div>
 {% endblock %}
 
-{% block scripts %}
-<script src="{% static 'attendance/js/attendance.js' %}" defer></script>
+{% block extra_js %}
+    {{ block.super }}
+    <!-- 데이터 주입 스크립트를 JS 파일 로드 전에 위치 -->
+    <script id="team-members-data" type="application/json">
+        {{ team_members_json|safe|default_if_none:'[]' }}
+    </script>
+    <script id="current-round-data" type="application/json">
+        {{ current_round_info_json|safe|default_if_none:'{"number": "01", "displayName": "1회차"}' }}
+    </script>
+    <script id="selected-team-id-data" type="application/json">
+        {% if selected_team %}"{{ selected_team.team_id }}"{% else %}null{% endif %}
+    </script>
+    <script id="available-rounds-data" type="application/json">
+        {{ available_rounds_json|safe|default_if_none:'[]' }}
+    </script>
+
+    <script>
+        // 이 JavaScript는 attendance.js가 로드되기 전에 실행되어야 할 수 있으므로,
+        // 또는 attendance.js 내부에서 이 로직을 포함하도록 할 수 있습니다.
+        // 여기서는 간단히 인라인으로 두겠습니다.
+        document.addEventListener('DOMContentLoaded', function() {
+            const roundSelector = document.getElementById('round_selector');
+            const availableRoundsDataElem = document.getElementById('available-rounds-data');
+            const currentRoundDataElem = document.getElementById('current-round-data');
+            let availableRounds = [];
+            let currentRoundInfoFromData = { number: "01", displayName: "1회차" }; // 기본값
+
+            if (availableRoundsDataElem) {
+                try {
+                    availableRounds = JSON.parse(availableRoundsDataElem.textContent);
+                } catch (e) { console.error("Error parsing available-rounds-data:", e); }
+            }
+            if (currentRoundDataElem) {
+                try {
+                    currentRoundInfoFromData = JSON.parse(currentRoundDataElem.textContent);
+                } catch (e) { console.error("Error parsing current-round-data:", e); }
+            }
+
+            if (roundSelector) { // roundSelector가 있을 때만 실행
+                if (availableRounds && availableRounds.length > 0) {
+                    roundSelector.innerHTML = ''; // 기존 "로딩 중..." 옵션 제거
+                    availableRounds.forEach(round => {
+                        const option = document.createElement('option');
+                        option.value = round.number;
+                        option.textContent = round.displayName;
+                        if (currentRoundInfoFromData && round.number === currentRoundInfoFromData.number) {
+                            option.selected = true;
+                        }
+                        roundSelector.appendChild(option);
+                    });
+                } else {
+                    roundSelector.innerHTML = '<option value="">선택 가능 회차 없음</option>';
+                }
+            }
+        });
+    </script>
+    <script src="{% static 'attendance/js/attendance.js' %}" defer></script>
 {% endblock %}
