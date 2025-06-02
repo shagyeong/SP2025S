@@ -122,13 +122,13 @@ def attendance_view(request):
     selected_team_id = request.GET.get("team")
     selected_team = team_list.filter(team_id=selected_team_id).first() if selected_team_id else team_list.first()
 
-    return render(request, 'attendance/templates/attendance.html', {
+    return render(request, 'attendance/attendance.html', {
         "teams": team_list,
         "selected_team": selected_team,
     })
 def instructor_attendance(request):
-    return render(request, 'attendance/templates/instructor_attendance.html')
+    return render(request, 'attendance/instructor_attendance.html')
 
 def team_attendance(request):
     rounds = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
-    return render(request, 'attendance/templates/team_attendance.html', {"rounds": rounds})
+    return render(request, 'attendance/team_attendance.html', {"rounds": rounds})
