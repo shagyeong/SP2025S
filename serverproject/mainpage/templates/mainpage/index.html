@@ -2,43 +2,44 @@
 {% load static %}
 
 {% block title %}팀플 헬퍼{% endblock %}
+
 {% block content %}
-
-
 <div class="container">
-  <form method="get" style="margin-bottom: 1rem;">
-    <label for="team">팀 선택:</label>
-    <select name="team" id="team" onchange="this.form.submit()">
-      {% for team in teams %}
-        <option value="{{ team.team_id }}" {% if team.team_id == selected_team.team_id %}selected{% endif %}>
-          {{ team.team_name }}
-        </option>
-      {% endfor %}
-    </select>
-  </form>
+  {# 팀 선택 버튼들이 여기에 동적으로 추가될 것입니다. #}
+  <div id="team-buttons-container" style="margin-bottom: 1rem;">
+      <div id="team-buttons" class="team-button-group">
+          {# student.js가 여기에 버튼들을 렌더링합니다. #}
+          {# 로딩 중이거나 팀이 없을 경우를 대비한 메시지를 초기에 넣어둘 수 있습니다. #}
+          <p>팀 목록을 불러오는 중...</p>
+      </div>
+  </div>
 
   <div class="box" id="team-info">
     <h3 id="team-name">👥 팀 정보</h3>
-    <div id="team-members"></div>
+    <div id="team-members">
+        <p>팀을 선택해주세요.</p> {# 초기 메시지 #}
+    </div>
   </div>
 
   <div class="box">
     <h3><span class="icon">📁</span> 공유 문서</h3>
-    <ul id="team-documents" class="notion-style-list"></ul>
+    <div id="team-documents" class="notion-style-list"> {# ul 대신 div로 변경하고 내부에서 동적 생성 #}
+        <p>팀을 선택해주세요.</p> {# 초기 메시지 #}
+    </div>
     <a href="{% url 'mainpage:documents' %}" class="btn-link">전체 문서 보기</a>
   </div>
 
   <div class="box">
-    <h3><span class="icon">✅</span> 출결 현황</h3>
-    <table class="attendance-table">
-      <thead><tr><th>이름</th><th>출결</th></tr></thead>
-      <tbody id="team-attendance"></tbody>
-    </table>
-    <a href="{% url 'attendance:attendance' %}" class="btn-link">전체 출결 보기</a>
+    <h3><span class="icon">✅</span> 출결 현황 (요약)</h3> {# 출결 현황 섹션은 요약 정보만 보여주거나, 선택된 팀에 따라 동적으로 로드 #}
+    <div id="team-attendance-summary">
+        <p>팀을 선택해주세요.</p> {# 초기 메시지 #}
+    </div>
+    <a href="{% url 'attendance:attendance' %}" class="btn-link">전체 출결 보기 및 체크</a>
   </div>
 </div>
 {% endblock %}
 
-{% block scripts %}
-<script src="{% static 'mainpage/js/student.js' %}"></script>
+{% block extra_js %} 
+    {{ block.super }}
+    <script src="{% static 'mainpage/js/student.js' %}"></script>
 {% endblock %}
