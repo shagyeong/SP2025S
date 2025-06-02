@@ -97,22 +97,22 @@ LOCK TABLES `team` WRITE;
 INSERT INTO `team` VALUES
     -- 2025 봄학기 서버프로그래밍 1 ~ 6조
     -- (가)반
-    ('01-001SP2025S-1', '1조 Alpha',   '21-001', '21-002', '21-003', '21-004', NULL),
-    ('01-001SP2025S-2', '2조 Bravo',   '21-005', '21-006', '21-007', '21-008', NULL),
-    ('01-001SP2025S-3', '3조 Charlie', '22-001', '22-002', '22-003', '22-004', NULL),
+    ('01-001SP2025S-1', '1조 Alpha',   '21-001', '21-002', '21-003', '21-004', NULL, NULL),
+    ('01-001SP2025S-2', '2조 Bravo',   '21-005', '21-006', '21-007', '21-008', NULL, NULL),
+    ('01-001SP2025S-3', '3조 Charlie', '22-001', '22-002', '22-003', '22-004', NULL, NULL),
     -- (나)반
-    ('01-001SP2025S-4', '4조 Delta',   '23-001', '23-002', '23-003', '23-004', NULL),
-    ('01-001SP2025S-5', '5조 Echo',    '23-005', '23-006', '23-007', '23-008', NULL),
-    ('01-001SP2025S-6', '6조 Foxtrot', '23-009', '24-001', '24-002', '24-003', NULL),
+    ('01-001SP2025S-4', '4조 Delta',   '23-001', '23-002', '23-003', '23-004', NULL, NULL),
+    ('01-001SP2025S-5', '5조 Echo',    '23-005', '23-006', '23-007', '23-008', NULL, NULL),
+    ('01-001SP2025S-6', '6조 Foxtrot', '23-009', '24-001', '24-002', '24-003', NULL, NULL),
     -- 2025 가을학기 모바일프로그래밍 1 ~ 6조
     -- (가)반
-    ('01-002MP2025F-1', '1조 Apple',   '21-001', '21-002', '21-005', '21-006', NULL),
-    ('01-002MP2025F-2', '2조 Banana',  '22-001', '22-002', '23-001', '23-002', NULL),
-    ('01-002MP2025F-3', '3조 Cat',     '23-005', '23-006', '23-009', '24-001', NULL),
+    ('01-002MP2025F-1', '1조 Apple',   '21-001', '21-002', '21-005', '21-006', NULL, NULL),
+    ('01-002MP2025F-2', '2조 Banana',  '22-001', '22-002', '23-001', '23-002', NULL, NULL),
+    ('01-002MP2025F-3', '3조 Cat',     '23-005', '23-006', '23-009', '24-001', NULL, NULL),
     -- (나)반
-    ('01-002MP2025F-4', '4조 Dog',     '21-003', '21-004', '21-007', '21-008', NULL),
-    ('01-002MP2025F-5', '5조 Elephant','22-003', '22-004', '23-003', '23-004', NULL),
-    ('01-002MP2025F-6', '6조 Fox',     '23-007', '23-008', '24-002', '24-003', NULL);
+    ('01-002MP2025F-4', '4조 Dog',     '21-003', '21-004', '21-007', '21-008', NULL, NULL),
+    ('01-002MP2025F-5', '5조 Elephant','22-003', '22-004', '23-003', '23-004', NULL, NULL),
+    ('01-002MP2025F-6', '6조 Fox',     '23-007', '23-008', '24-002', '24-003', NULL, NULL);
 /*!40000 ALTER TABLE `team` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -123,6 +123,7 @@ DROP TABLE IF EXISTS `attendance`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `attendance`(
+    `id` INT NOT NULL AUTO_INCREMENT, -- id 컬럼 추가 및 자동 증가
     `team_id` varchar(15) NOT NULL,
     `round` varchar(2) NOT NULL,
     `at_leader` varchar(1) DEFAULT NULL,
@@ -130,15 +131,17 @@ CREATE TABLE `attendance`(
     `at_mate2` varchar(1) DEFAULT NULL,
     `at_mate3` varchar(1) DEFAULT NULL,
     `at_mate4` varchar(1) DEFAULT NULL,    
-    PRIMARY KEY (`team_id`, `round`),
+    PRIMARY KEY (`id`), -- id를 기본 키로 설정
     KEY `team_id` (`team_id`),
+    UNIQUE KEY `unique_attendance` (`team_id`, `round`), -- 기존 복합 PK는 유니크 제약 조건으로 유지
+    KEY `team_id_fk_idx` (`team_id`),
     CONSTRAINT `attendance_fk_1` FOREIGN KEY (`team_id`)
     REFERENCES `team` (`team_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 LOCK TABLES `attendance` WRITE;
 /*!40000 ALTER TABLE `attendance` DISABLE KEYS */;
-INSERT INTO `attendance` VALUES
+INSERT INTO `attendance` (team_id, round, at_leader, at_mate1, at_mate2, at_mate3, at_mate4) VALUES
     -- 2025 봄학기 서버프로그래밍 1 ~ 5조 1 ~ 10회차 출석부
     ('01-001SP2025S-1', '01', 'x', 'x', 'x', 'x', 'x'),
     ('01-001SP2025S-1', '02', 'x', 'x', 'x', 'x', 'x'),
