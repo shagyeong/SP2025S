@@ -9,6 +9,13 @@ from django.contrib.auth.decorators import login_required
 from team.models import Team
 from team.models import Student
 
+def get_student_name_by_id(student_id):
+    try:
+        student = Student.objects.get(student_id=student_id)
+        return student.name
+    except Student.DoesNotExist:
+        return None
+
 class AttendanceListCreateView(APIView):
     def post(self, request, *args, **kwargs):
         serializer = AttendanceSerializer(data=request.data)
@@ -18,14 +25,7 @@ class AttendanceListCreateView(APIView):
             team_id = attendance.team_id
             team = Team.objects.select_related('leader').get(team_id=team_id)
 
-            def get_student_name_by_id(student_id):
-                try:
-                    student = Student.objects.get(student_id=student_id)
-                    student_name = student.name
-                    return student_name
-                except Student.DoesNotExist:
-                    return None
-            leader_name = get_student_name_by_id(team.leader)
+            leader_name = get_student_name_by_id(team.leader.student_id) if team.leader else None
             mate1_name = get_student_name_by_id(team.mate1_id)
             mate2_name = get_student_name_by_id(team.mate2_id)
             mate3_name = get_student_name_by_id(team.mate3_id)
