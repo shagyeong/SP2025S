@@ -14,7 +14,6 @@
         {% if selected_team %}"{{ selected_team.team_id }}"{% else %}null{% endif %}
     </script>
     <style>
-      /* 팀 선택 버튼 그룹 스타일 (기존 스타일 참고 또는 student.css에서 가져옴) */
       .team-button-group {
           display: flex;
           flex-wrap: wrap;
@@ -51,7 +50,6 @@
           box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
       }
 
-      /* --- ▼▼▼ 출결 확인 섹션 UI 개선 (팀 선택 버튼과 유사한 스타일) ▼▼▼ --- */
       #attendance-checklist {
           display: flex;
           flex-direction: column;
@@ -104,7 +102,6 @@
       }
 
       /* 출석 버튼 스타일 */
-      /* 기본 상태는 label 공통 스타일 사용, 선택 시 .selected 클래스로 변경 */
       .team-member-attendance-item .status-options label.status-present-label:not(.selected):hover {
           background-color: #ECFDF5; /* Tailwind green-50 (더 연하게) */
           border-color: #A7F3D0; /* Tailwind green-200 */
@@ -130,7 +127,6 @@
           font-weight: 500;
       }
 
-      /* "출석 완료" 버튼 (기존 스타일과 유사하게 유지 또는 팀 선택 버튼과 통일) */
       #submit-attendance {
           margin-top: 1.5rem;
           padding: 0.7rem 1.3rem; /* 패딩 약간 증가 */
@@ -148,15 +144,13 @@
           background-color: #2563EB; /* 더 진한 파란색 */
       }
 
-      /* 타임스탬프 (기존 스타일 유지) */
+      /* 타임스탬프 */
       #attendance-timestamp {
           margin-top: 0.8rem;
           font-size: 0.85rem;
           color: #6B7280; /* Tailwind gray-500 */
       }
-      /* --- ▲▲▲ 출결 확인 섹션 UI 개선 CSS ▲▲▲ --- */
-
-      /* 출결 기록 테이블 셀 스타일 (기존 스타일 유지) */
+      
       td.present {
           color: #15803D; /* Tailwind green-700 */
           text-align: center;
@@ -262,9 +256,6 @@
     </script>
 
     <script>
-        // 이 JavaScript는 attendance.js가 로드되기 전에 실행되어야 할 수 있으므로,
-        // 또는 attendance.js 내부에서 이 로직을 포함하도록 할 수 있습니다.
-        // 여기서는 간단히 인라인으로 두겠습니다.
         document.addEventListener('DOMContentLoaded', function() {
             const roundSelector = document.getElementById('round_selector');
             const availableRoundsDataElem = document.getElementById('available-rounds-data');

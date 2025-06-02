@@ -9,7 +9,7 @@ class Attendance(models.Model):
     at_mate2 = models.CharField(max_length=1, null=True, blank=True)
     at_mate3 = models.CharField(max_length=1, null=True, blank=True)
     at_mate4 = models.CharField(max_length=1, null=True, blank=True)
-    updated_at = models.DateTimeField(auto_now=True, null=True, blank=True) # ★★★ 타임스탬프 필드 추가 ★★★
+    updated_at = models.DateTimeField(auto_now=True, null=True, blank=True)
 
     class Meta:
         db_table = 'attendance'

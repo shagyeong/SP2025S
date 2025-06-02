@@ -36,7 +36,6 @@ document.addEventListener("DOMContentLoaded", function () {
         currentRoundInfo = JSON.parse(document.getElementById('current-round-data').textContent);
     } catch (e) {
         console.error("현재 회차 정보 로딩 실패:", e);
-        // 기본값은 이미 설정됨
     }
     try {
         const selectedTeamIdData = document.getElementById('selected-team-id-data');
@@ -61,13 +60,8 @@ document.addEventListener("DOMContentLoaded", function () {
     historyTableHead = document.getElementById("history-table-head");
     currentSessionNameDisplay = document.getElementById('current-session-name-display');
 
-    // selected_team이 없으면 (즉, currentSelectedTeamId가 null이면)
-    // 출결 관련 섹션의 DOM 요소들이 없을 수 있으므로, 해당 요소들에 대한 참조가 null이 될 수 있습니다.
-    // 따라서, selected_team이 있을 때만 해당 요소들을 사용하도록 합니다.
-
     if (!currentSelectedTeamId) {
         console.warn("선택된 팀 ID가 없습니다. 출결 기능을 초기화하지 않습니다.");
-        // 필요하다면 사용자에게 메시지 표시 (이미 템플릿에서 처리 중)
         if (submitBtn) submitBtn.style.display = 'none'; // 제출 버튼 숨기기
         return;
     }
@@ -106,7 +100,7 @@ function renderTeamMembersForAttendance() {
         console.error("출석 체크리스트 div(attendance-checklist)를 찾을 수 없습니다.");
         return;
     }
-    checklistDiv.innerHTML = ''; // 기존 내용을 비웁니다.
+    checklistDiv.innerHTML = ''; // 기존 내용을 비움
 
     if (!teamMembers || teamMembers.length === 0) {
         checklistDiv.innerHTML = '<p style="padding: 1rem 0;">팀원 정보가 없습니다. 관리자에게 문의하세요.</p>';

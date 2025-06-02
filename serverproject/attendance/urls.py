@@ -1,6 +1,6 @@
 from django.urls import path
 from . import views
-from .views import AttendanceListCreateView, AttendanceByTeamView, AttendanceByRoundView, attendance_view, instructor_attendance, team_attendance
+from .views import AttendanceListCreateView, AttendanceByTeamView, AttendanceByRoundView, AttendanceSummaryView, attendance_view, instructor_attendance, team_attendance
 
 app_name = 'attendance'
 
@@ -12,4 +12,5 @@ urlpatterns = [
     path('att/', AttendanceListCreateView.as_view(), name='attendance-create'),
     path('att/<str:team_id>/', AttendanceByTeamView.as_view(), name='attendance-by-team'),
     path('att/<str:team_id>/round/', AttendanceByRoundView.as_view(), name='attendance-by-round'),
+    path('att/summary/<str:team_id>/', AttendanceSummaryView.as_view(), name='attendance-summary-by-team'),
 ]

@@ -31,15 +31,13 @@ class AttendanceListCreateView(APIView):
                             status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            # 해당 team_id와 round로 기존 출석 기록을 가져옵니다.
+            # 해당 team_id와 round로 기존 출석 기록을 가져옴
             instance = Attendance.objects.get(team_id=team_id, round=round_number)
-            # 이미 존재하면, 이 인스턴스를 업데이트합니다.
-            # partial=True를 사용하면 모든 필드를 제공하지 않아도 부분 업데이트가 가능합니다.
             serializer = AttendanceSerializer(instance, data=request.data, partial=True)
             action_message = "출석 수정 완료"
             response_status = status.HTTP_200_OK
         except Attendance.DoesNotExist:
-            # 존재하지 않으면, 새로 생성합니다.
+            # 존재하지 않으면, 새로 생성
             serializer = AttendanceSerializer(data=request.data)
             action_message = "출석 등록 완료"
             response_status = status.HTTP_201_CREATED
@@ -50,7 +48,7 @@ class AttendanceListCreateView(APIView):
         if serializer.is_valid():
             attendance = serializer.save()
 
-            # 팀원 이름 정보 가져오기 (이 부분은 응답에 포함시키기 위함)
+            # 팀원 이름 정보 가져오기
             try:
                 team = Team.objects.select_related('leader').get(team_id=attendance.team_id)
                 leader_name = get_student_name_by_id(team.leader.student_id) if team.leader else None
@@ -79,7 +77,6 @@ class AttendanceListCreateView(APIView):
                 "mate4_name": mate4_name,
             }, status=response_status)
         else:
-            # 시리얼라이저 유효성 검사 실패 시 오류 반환
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -137,12 +134,9 @@ class AttendanceByRoundView(APIView):
 
 
 
-# def attendance_view(request):
-#     return render(request, 'attendance/attendance.html')
-
 @login_required
 def attendance_view(request):
-    student_id = request.user.username # User 모델의 username을 student_id로 사용한다고 가정
+    student_id = request.user.username
 
     # 학생이 속한 팀 목록 가져오기
     team_list = Team.objects.filter(
@@ -215,3 +209,65 @@ def instructor_attendance(request):
 def team_attendance(request):
     rounds = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
     return render(request, 'attendance/team_attendance.html', {"rounds": rounds})
+
+from django.db.models import Count, Case, When, IntegerField
+from rest_framework.permissions import IsAuthenticated
+
+class AttendanceSummaryView(APIView):
+    permission_classes = [IsAuthenticated] # 로그인한 사용자만 접근 가능
+
+    def get(self, request, team_id):
+        user_student_id = request.user.username
+        user_student_name = get_student_name_by_id(user_student_id)
+
+        if not user_student_name: # 학생 이름을 찾을 수 없는 경우 
+            return Response({"error": f"Student record not found for ID: {user_student_id}"},
+                            status=status.HTTP_404_NOT_FOUND)
+
+        try:
+            team = Team.objects.get(team_id=team_id)
+        except Team.DoesNotExist:
+            return Response({"error": "Team not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        user_attendance_field_key = None
+        if team.leader and team.leader.student_id == user_student_id:
+            user_attendance_field_key = 'at_leader'
+        elif team.mate1_id == user_student_id:
+            user_attendance_field_key = 'at_mate1'
+        # ... (mate2, mate3, mate4에 대한 elif 계속) ...
+        elif team.mate2_id == user_student_id: # 추가
+            user_attendance_field_key = 'at_mate2'
+        elif team.mate3_id == user_student_id: # 추가
+            user_attendance_field_key = 'at_mate3'
+        elif team.mate4_id == user_student_id: # 추가
+            user_attendance_field_key = 'at_mate4'
+
+
+        if not user_attendance_field_key:
+            return Response({"message": f"'{user_student_name}'님은 현재 '{team.team_name}' 팀의 멤버가 아닙니다."},
+                            status=status.HTTP_200_OK)
+
+        present_count_kwargs = {f"{user_attendance_field_key}__iexact": 'O'}
+        present_count = Attendance.objects.filter(team_id=team_id, **present_count_kwargs).count()
+
+        absent_count_kwargs = {f"{user_attendance_field_key}__iexact": 'X'}
+        absent_count = Attendance.objects.filter(team_id=team_id, **absent_count_kwargs).count()
+
+        total_records_for_member = Attendance.objects.filter(team_id=team_id).count()
+
+        summary_data = {
+            "team_id": team_id,
+            "team_name": team.team_name,
+            "user_student_id": user_student_id,
+            "user_student_name": user_student_name, 
+            "present_count": present_count,
+            "absent_count": absent_count,
+            "total_sessions_for_member": total_records_for_member,
+            "message": f"'{team.team_name}' 팀에서 '{user_student_name}'님의 출석: {present_count}회, 결석: {absent_count}회 (총 {total_records_for_member}회차 중)"
+        }
+        
+        if total_records_for_member == 0 :
+             return Response({"message": f"'{team.team_name}' 팀의 출결 기록이 아직 없습니다."}, status=status.HTTP_200_OK)
+
+
+        return Response(summary_data, status=status.HTTP_200_OK)
