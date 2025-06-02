@@ -16,13 +16,12 @@ class AttendanceListCreateView(APIView):
             attendance = serializer.save()
 
             team_id = attendance.team_id
-            # leader_id 필드는 ForeignKey이므로 select_related로 객체 가져오기
             team = Team.objects.select_related('leader').get(team_id=team_id)
 
             def get_student_name_by_id(student_id):
                 try:
                     student = Student.objects.get(student_id=student_id)
-                    student_name = student.name  # 'name'은 Student 모델의 필드 이름
+                    student_name = student.name
                     return student_name
                 except Student.DoesNotExist:
                     return None
