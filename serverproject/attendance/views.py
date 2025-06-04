@@ -9,7 +9,60 @@ from django.contrib.auth.decorators import login_required
 from team.models import Team, Student
 from django.db.models import Q
 import json
+from rest_framework.permissions import IsAuthenticated
+from .serializers import AttendanceSerializer
 
+# serverproject/attendance/views.py - AllTeamsAttendanceByRoundView 부분
+class AllTeamsAttendanceByRoundView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        # print("--- AllTeamsAttendanceByRoundView GET method CALLED ---") # 이 로그가 찍히는지 Django 서버 콘솔에서 확인
+        round_number = request.query_params.get('round')
+        if not round_number:
+            return Response({"error": "Missing 'round' query parameter"}, status=status.HTTP_400_BAD_REQUEST)
+
+        round_number_str = str(round_number).zfill(2)
+        all_teams = Team.objects.all().order_by('team_name')
+
+        if not all_teams.exists():
+             # 팀이 아예 없으면 200 OK와 함께 메시지 반환 (404 아님)
+             return Response({"message": "등록된 팀이 없습니다."}, status=status.HTTP_200_OK)
+
+        attendance_data_for_round = []
+        # has_any_attendance_for_round = False # 이 플래그는 현재 사용되지 않음
+
+        for team in all_teams:
+            team_info = {
+                # ... (팀 정보 및 기본 출결 상태 '-' 구성) ...
+                "team_id": team.team_id,
+                "team_name": team.team_name,
+                "leader_id": team.leader.student_id if team.leader else None,
+                "leader_name": team.leader.name if team.leader else None,
+                "mate1_id": team.mate1_id, "mate1_name": get_student_name_by_id(team.mate1_id),
+                "mate2_id": team.mate2_id, "mate2_name": get_student_name_by_id(team.mate2_id),
+                "mate3_id": team.mate3_id, "mate3_name": get_student_name_by_id(team.mate3_id),
+                "mate4_id": team.mate4_id, "mate4_name": get_student_name_by_id(team.mate4_id),
+                "attendance_status": { "at_leader": "-", "at_mate1": "-", "at_mate2": "-", "at_mate3": "-", "at_mate4": "-" }
+            }
+            try:
+                attendance_record = Attendance.objects.get(team_id=team.team_id, round=round_number_str)
+                # ... (출결 상태 업데이트) ...
+                team_info["attendance_status"]["at_leader"] = attendance_record.at_leader
+                team_info["attendance_status"]["at_mate1"] = attendance_record.at_mate1
+                team_info["attendance_status"]["at_mate2"] = attendance_record.at_mate2
+                team_info["attendance_status"]["at_mate3"] = attendance_record.at_mate3
+                team_info["attendance_status"]["at_mate4"] = attendance_record.at_mate4
+                # has_any_attendance_for_round = True
+            except Attendance.DoesNotExist:
+                pass
+            attendance_data_for_round.append(team_info)
+        
+        # 이전에 있던 if not attendance_data_for_round: 조건은 위에서 if not all_teams.exists(): 로 처리됨.
+        # attendance_data_for_round는 all_teams가 존재하면 항상 채워짐 (출결 기록이 없더라도 팀 정보는 포함)
+
+        return Response(attendance_data_for_round, status=status.HTTP_200_OK) # 항상 200 OK와 함께 데이터를 반환해야 함
+    
 def get_student_name_by_id(student_id):
     try:
         student = Student.objects.get(student_id=student_id)
@@ -90,48 +143,58 @@ class AttendanceByTeamView(APIView):
         return Response(serializer.data)
 
 class AttendanceByRoundView(APIView):
-    """GET /attendance/{team_id}/{round} 조회 & PUT 수정"""
-    
+    """GET /api/attendance/att/<team_id>/round/?round=<round> 조회 & PUT 수정"""
+    permission_classes = [IsAuthenticated] # 교수자 등 권한 확인
+
     def get(self, request, team_id):
         round_number = request.query_params.get('round')
         if not round_number:
             return Response({"error": "Missing 'round' parameter"}, status=status.HTTP_400_BAD_REQUEST)
 
-        round_number = round_number.zfill(2)
-        attendance = get_object_or_404(Attendance, team_id=team_id, round=round_number)
-        serializer = AttendanceSerializer(attendance)
+        round_number_str = str(round_number).zfill(2) # "1" -> "01"
 
-        # 팀 정보 가져오기
-        team = get_object_or_404(Team, team_id=team_id)
-        team_info = {
-            "leader_id": team.leader_id,
+        # 출석 기록 가져오기
+        attendance = get_object_or_404(Attendance, team_id=team_id, round=round_number_str)
+        attendance_serializer_data = AttendanceSerializer(attendance).data # 출결 상태 (at_leader 등)
+
+        # 팀 정보 및 팀원 이름 정보 가져오기
+        team = get_object_or_404(Team.objects.select_related('leader'), team_id=team_id) # leader 정보 미리 가져오기
+
+        team_members_info = {
+            "leader_id": team.leader.student_id if team.leader else None,
+            "leader_name": team.leader.name if team.leader else None, # Student 모델에 'name' 필드 가정
             "mate1_id": team.mate1_id,
+            "mate1_name": get_student_name_by_id(team.mate1_id),
             "mate2_id": team.mate2_id,
+            "mate2_name": get_student_name_by_id(team.mate2_id),
             "mate3_id": team.mate3_id,
+            "mate3_name": get_student_name_by_id(team.mate3_id),
             "mate4_id": team.mate4_id,
+            "mate4_name": get_student_name_by_id(team.mate4_id),
         }
 
-        return Response({
-            **serializer.data,
-            "team": team_info  # 프론트에서 team.mate1_id 등으로 접근할 수 있도록
-        })
+        # 최종 응답 데이터 구성
+        response_data = {
+            **attendance_serializer_data, # team_id, round, at_leader, at_mate1, ...
+            "team_members": team_members_info # team_id 대신 team_members 객체로 팀원 정보 전달
+        }
 
+        return Response(response_data, status=status.HTTP_200_OK)
 
     def put(self, request, team_id):
+        # ... (PUT 로직은 이전과 동일하게 유지) ...
         round_number = request.query_params.get('round')
         if not round_number:
             return Response({"error": "Missing 'round' parameter"}, status=status.HTTP_400_BAD_REQUEST)
         
-        round_number = round_number.zfill(2)  # 1 → '01', 2 → '02' 형식으로 보정
-        attendance = get_object_or_404(Attendance, team_id=team_id, round=round_number)
-        serializer = AttendanceSerializer(attendance, data=request.data)
+        round_number_str = str(round_number).zfill(2)
+        attendance = get_object_or_404(Attendance, team_id=team_id, round=round_number_str)
+        serializer = AttendanceSerializer(attendance, data=request.data, partial=True) # partial=True 추가
         
-
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data)
+            return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
 
 
 @login_required

@@ -31,4 +31,5 @@ urlpatterns = [
     path('api/', include('team.urls', namespace='team_api')),                      # API용
     path('instructor/', include('instructor.urls', namespace='instructor')),
     path('common/',include('common.urls')),
+    path('api/', include('student.urls', namespace='student_api')),
 ]
