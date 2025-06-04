@@ -152,22 +152,73 @@ td.team-leader {
     background-color: #0056b3;
 }
 
-
-.team-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 1rem;
-    background-color: #fff;
-}
-
-.team-table th,
-.team-table td {
-    border: 1px solid #ddd;
-    padding: 12px;
+.team-table td.manage-cell { /* 관리 컬럼 셀 */
+    position: relative; /* 드롭다운 메뉴의 기준점 */
     text-align: center;
 }
 
-.team-table th {
-    background-color: #f2f2f2;
-    font-weight: bold;
+.btn-more { /* "⋯" 버튼 */
+    background-color: transparent;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 2px 6px;
+    line-height: 1;
+    border-radius: 4px; /* 약간의 둥근 처리 */
+}
+.btn-more:hover {
+    background-color: #f0f0f0;
+}
+
+.manage-dropdown-menu {
+    display: none; /* 초기에는 숨김 (JS로 토글) */
+    position: absolute;
+    right: 5px; /* 셀의 오른쪽에 붙도록 조정 */
+    top: calc(100% + 2px); /* 버튼 바로 아래, 약간의 간격 */
+    background-color: white;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    z-index: 100; /* 다른 요소 위에 표시 */
+    min-width: 100px; /* 최소 너비 */
+    padding: 4px 0;
+}
+
+.manage-dropdown-menu .dropdown-item {
+    display: block;
+    width: 100%;
+    padding: 6px 10px; /* 패딩 조정 */
+    text-align: left;
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 0.85rem; /* 폰트 크기 조정 */
+    white-space: nowrap;
+    color: #333; /* 기본 글자색 */
+}
+
+.manage-dropdown-menu .dropdown-item:hover {
+    background-color: #f5f5f5;
+    color: #000;
+}
+
+/* 버튼 내 아이콘과 텍스트 간격 (선택 사항) */
+.btn-manage .btn-text,
+.dropdown-item .btn-text { /* 만약 드롭다운 아이템에도 텍스트 span을 사용한다면 */
+    margin-left: 4px;
+    vertical-align: middle;
+}
+.btn-manage > svg, /* SVG 아이콘을 사용한다면 */
+.btn-manage > i,  /* FontAwesome 같은 아이콘 폰트를 사용한다면 */
+.dropdown-item > svg,
+.dropdown-item > i {
+    vertical-align: middle;
+}
+
+/* mainpage/css/main.css 또는 instructor/css/instructor.css */
+main.container { /* 또는 그냥 .container 만약 main 태그에만 class가 적용된다면 */
+    padding-top: 40px; /* 원하는 상단 여백 */
+    /* 만약 기존 padding: 20px; 와 같은 설정이 있다면,
+       padding: 25px 20px 20px 20px; /* 상, 우, 하, 좌 */
+    /* 와 같이 수정할 수 있습니다. */
 }

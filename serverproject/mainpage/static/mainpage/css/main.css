@@ -16,15 +16,23 @@ body {
     margin: 0;
     padding: 0;
     background-color: #f5f5f5;
+    margin-top: 40px;
 }
 
-.navbar {
+.navbar { /* 또는 네비게이션 바를 감싸는 최상위 요소의 클래스/ID */
     background-color: #333;
     color: white;
-    padding: 15px;
+    padding: 15px 20px;
     display: flex;
     justify-content: space-between;
     align-items: center;
+
+    position: fixed; 
+    top: 0;          
+    left: 0;       
+    width: 100%;   
+    z-index: 1000;  
+    box-sizing: border-box; 
 }
 
 .navbar a {
