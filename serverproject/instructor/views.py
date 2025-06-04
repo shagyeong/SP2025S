@@ -1,6 +1,4 @@
-from django.shortcuts import render
 
-# Create your views here.
 from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -10,6 +8,11 @@ from .models import Instructor
 from team.models import Team
 from .serializers import InstructorSerializer
 from django.contrib.auth.decorators import login_required
+from rest_framework.permissions import IsAuthenticated
+from team.serializers import TeamSerializer
+from .models import Section
+from instructor.models import Teaches
+from django.db.models import Q
 
 @login_required
 def instructor_view(request):
@@ -57,3 +60,57 @@ class InstructorTeamView(APIView):
             return Response({"teams": data}, status=200)
         except Instructor.DoesNotExist:
             return Response({"error": "Instructor not found"}, status=404)
+        
+class ProfessorTeamsView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+        teams_to_serialize = Team.objects.none()
+
+        try:
+            instructor = Instructor.objects.get(instructor_id=user.username)
+            print(f"\n[ProfessorTeamsView] --- Request from user: {user.username} ---")
+            print(f"[ProfessorTeamsView] Found instructor object: {instructor}")
+
+            taught_section_keys = Teaches.objects.filter(instructor=instructor).values(
+                'section_obj_id', 
+                'section_obj_year',
+                'section_obj_semester' 
+            ).distinct()
+
+            print(f"[ProfessorTeamsView] Taught section keys from Teaches table: {list(taught_section_keys)}")
+
+            if not taught_section_keys:
+                print(f"[ProfessorTeamsView] No taught sections found for instructor {instructor.instructor_id}.")
+                return Response([], status=status.HTTP_200_OK)
+
+            team_filter_query = Q()
+            for sec_keys in taught_section_keys:
+                s_id = sec_keys.get('section_obj_id')
+                s_year = sec_keys.get('section_obj_year')
+                s_semester = sec_keys.get('section_obj_semester')
+
+                if not (s_id and s_year and s_semester):
+                    print(f"[ProfessorTeamsView] Warning: Missing key in sec_keys: {sec_keys}")
+                    continue
+
+                team_id_prefix_pattern = f"{s_id}{s_year}{s_semester}-"
+                print(f"[ProfessorTeamsView] Constructed team_id_prefix_pattern: '{team_id_prefix_pattern}'")
+                team_filter_query |= Q(team_id__startswith=team_id_prefix_pattern)
+            
+            if team_filter_query:
+                teams_to_serialize = Team.objects.filter(team_filter_query).order_by('team_name')
+                print(f"[ProfessorTeamsView] Teams found after filtering: {teams_to_serialize.count()}")
+            else:
+                print(f"[ProfessorTeamsView] No team filter query was built.")
+
+        except Instructor.DoesNotExist:
+            print(f"[ProfessorTeamsView] User {user.username} is not an instructor.")
+            return Response({"error": "교수자 정보를 찾을 수 없습니다."}, status=status.HTTP_403_FORBIDDEN)
+        except Exception as e:
+            print(f"[ProfessorTeamsView] An unexpected error occurred: {e}")
+            # return Response({"error": f"Internal server error: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        serializer = TeamSerializer(teams_to_serialize, many=True)
+        return Response(serializer.data)
