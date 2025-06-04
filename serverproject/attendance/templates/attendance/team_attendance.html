@@ -1,102 +1,298 @@
-<!-- 교수자용 출결 상세 확인 페이지 -->
-
-
+<!-- serverproject/attendance/templates/attendance/team_attendance.html -->
 {% extends 'instructor/base_instructor.html' %}
 {% load static %}
 
-{% block title %}출결 상세{% endblock %}
+{% block title %}팀 출결 상세{% endblock %}
+
+{% block extra_css %}
+    {{ block.super }}
+    <style>
+        .attendance-detail-page {
+            background-color: #fff;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            margin-top: 50px;
+        }
+        .attendance-detail-page h1 {
+            font-size: 1.6rem;
+            margin-top: 0; /* h1의 기본 상단 마진 제거 */
+            margin-bottom: 1.5rem;
+            color: #333;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 0.8rem;
+            display: flex; /* 아이콘 정렬 */
+            align-items: center;
+        }
+        .attendance-detail-page h1 .icon { /* 📋 아이콘 스타일 */
+            margin-right: 0.75rem;
+            font-size: 1.8rem; /* 아이콘 크기 */
+        }
+
+        .controls-area {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            padding: 1rem; /* 컨트롤 영역 자체에도 패딩 */
+            background-color: #f8f9fa; /* 약간의 배경색 */
+            border-radius: 6px;
+        }
+        .controls-area label {
+            font-weight: 500;
+            color: #4A5568;
+        }
+        .controls-area #team-name-display-text {
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: #2D3748;
+            padding: 0.3rem 0;
+            border-bottom: 2px solid #3B82F6; /* 강조 밑줄 */
+        }
+        .controls-area select {
+            padding: 0.55rem 0.8rem; /* 패딩 통일 */
+            border: 1px solid #D1D5DB;
+            border-radius: 0.375rem;
+            background-color: white;
+            font-size: 0.9rem;
+        }
+        .btn-action, /* 조회 버튼 */
+        .btn-back {  /* 돌아가기 버튼 */
+            padding: 0.6rem 1.2rem;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 0.9rem;
+            text-decoration: none;
+            transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+            border: none;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .btn-action {
+            background-color: #3B82F6;
+            color: white;
+        }
+        .btn-action:hover {
+            background-color: #2563EB;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+        }
+        .btn-back {
+            background-color: #6B7280;
+            color: white;
+            margin-top: 1.5rem;
+            display: inline-block;
+        }
+        .btn-back:hover {
+            background-color: #4B5563;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+        }
+
+        .attendance-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1.5rem; /* 컨트롤 영역과의 간격 */
+            font-size: 0.9rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05); /* 테이블에도 약간의 그림자 */
+            border-radius: 6px;
+            overflow: hidden; 
+        }
+        .attendance-table th, .attendance-table td {
+            border: 1px solid #E5E7EB;
+            padding: 0.8rem 1rem;
+            text-align: left;
+        }
+        .attendance-table th {
+            background-color: #F3F4F6; /* 헤더 배경색 변경 */
+            font-weight: 600;
+            color: #1F2937; /* 헤더 글자색 변경 */
+        }
+        .attendance-table td {
+            color: #374151; /* 기본 셀 글자색 */
+            background-color: #fff; /* 셀 배경 흰색 */
+        }
+        .attendance-table td.status-present {
+            color: #059669; /* Tailwind green-600 */
+            font-weight: 500;
+        }
+        .attendance-table td.status-absent {
+            color: #DC2626; /* Tailwind red-600 */
+            font-weight: 500;
+        }
+    </style>
+{% endblock %}
 
 {% block content %}
 <div class="attendance-detail-page">
-    <h1>📋 출결 상세</h1>
+    <h1><span class="icon">📋</span> 팀 출결 상세</h1>
 
     <div>
-        <label for="team-select">팀 ID: </label>
-        <input type="text" id="team-id" placeholder="예: 01-001SP2025S-1">
-        <label for="round-select">회차: </label>
+    <div class="controls-area">
+        <label for="team-name-display-text">팀 ID: </label>
+        <span id="team-name-display-text">팀 정보 로딩 중...</span>
+        <input type="hidden" id="team-id-hidden">
+
+        <label for="round-select" style="margin-left: auto;">회차: </label> {# 회차 선택을 오른쪽으로 #}
         <select id="round-select">
             {% for i in rounds %}
               <option value="{{ i }}">{{ i }}회차</option>
             {% endfor %}
           </select>
-        <button id="load-team-attendance">조회</button>
+        <button id="load-team-attendance" class="btn-action">조회</button>
+    </div>
     </div>
 
-    <table class="attendance-table" style="margin-top: 20px;">
+    <table class="attendance-table">
         <thead>
             <tr>
                 <th>역할</th>
-                <th>학번 </th>
+                <th>명단</th>
                 <th>출결</th>
             </tr>
         </thead>
         <tbody id="attendance-body">
-            <!-- JS로 렌더링 -->
+            <tr><td colspan="3" style="text-align:center; padding: 1rem;">팀과 회차를 선택하고 조회 버튼을 눌러주세요.</td></tr>
         </tbody>
     </table>
 
-    <button onclick="goBack()" style="margin-top: 20px;">돌아가기</button>
+    <button onclick="goBack()" class="btn-back">목록으로 돌아가기</button>
 </div>
 {% endblock %}
 
 {% block extra_js %}
-<script>
-function goBack() {
-    window.history.back();
-}
+    {# JavaScript는 이전 답변과 동일하게 유지 #}
+    <script>
+    function goBack() { window.history.back(); }
 
-// URL에서 쿼리스트링 파라미터 가져오기 함수
-function getQueryParam(param) {
-    const urlParams = new URLSearchParams(window.location.search);
-    return urlParams.get(param);
-}
-
-document.addEventListener("DOMContentLoaded", () => {
-    // URL 쿼리스트링에서 team_id 가져오기
-    const params = new URLSearchParams(window.location.search);
-    const teamId = params.get("team_id");
-
-    if (teamId) {
-        document.getElementById("team-id").value = teamId;
+    function getQueryParam(param) {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get(param);
     }
 
-    document.getElementById("load-team-attendance").addEventListener("click", () => {
-        const teamId = document.getElementById("team-id").value.trim();
-        const round = document.getElementById("round-select").value;
-       
-        fetch(`/api/attendance/${teamId}/round/?round=${round}`)
-            .then(res => res.json())
-            .then(data => {
-                const tableBody = document.getElementById("attendance-body");
-                tableBody.innerHTML = "";
+    document.addEventListener("DOMContentLoaded", () => {
+        const teamNameDisplayText = document.getElementById("team-name-display-text");
+        const teamIdHiddenInput = document.getElementById("team-id-hidden");
+        const roundSelect = document.getElementById("round-select");
+        const attendanceTableBody = document.getElementById("attendance-body");
+        const loadButton = document.getElementById("load-team-attendance");
 
-                const fields = {
-                    at_leader: "팀장",
-                    at_mate1: "팀원1",
-                    at_mate2: "팀원2",
-                    at_mate3: "팀원3",
-                    at_mate4: "팀원4"
-                };
+        const initialTeamId = getQueryParam("team_id");
+        const initialTeamName = getQueryParam("team_name");
 
-                Object.entries(fields).forEach(([key, label]) => {
-                    const status = data[key] === "o" ? "✅ 출석" : "❌ 결석";
-                    const studentId = data.team?.[key.replace("at_", "") + "_id"] || "-";
-                    const row = document.createElement("tr");
-                    row.innerHTML = `
-                        <td>${label}</td>
-                        <td>${studentId}</td>
-                        <td>${status}</td>
-                    `;
-                    tableBody.appendChild(row);
+        if (initialTeamId) {
+            teamIdHiddenInput.value = initialTeamId;
+        }
+        if (initialTeamName) {
+        teamNameDisplayText.textContent = initialTeamName; // URL에서 가져온 팀 이름을 span에 설정
+        } else if (initialTeamId) {
+            // team_name 파라미터가 없으면, ID라도 표시
+            teamNameDisplayText.textContent = `${initialTeamId}`;
+        } else {
+            // team_id도 없으면
+            teamNameDisplayText.textContent = '팀 정보 없음';
+        }
+
+        async function fetchAndRenderAttendance() {
+            const teamId = teamIdHiddenInput.value.trim();
+            const round = roundSelect.value;
+
+            if (!teamId) {
+                alert("팀 ID 정보가 없습니다. 이전 페이지에서 팀을 다시 선택해주세요.");
+                attendanceTableBody.innerHTML = '<tr><td colspan="3">팀을 선택해주세요.</td></tr>';
+                return;
+            }
+            if (!round) {
+                alert("회차를 선택해주세요.");
+                attendanceTableBody.innerHTML = '<tr><td colspan="3">회차를 선택해주세요.</td></tr>';
+                return;
+            }
+
+            attendanceTableBody.innerHTML = '<tr><td colspan="3" style="text-align:center; padding:1rem;">출결 정보 로딩 중...</td></tr>';
+
+            try {
+                const response = await fetch(`/api/attendance/att/${teamId}/round/?round=${round}`);
+                if (!response.ok) {
+                    let errorMsg = `HTTP error! status: ${response.status}`;
+                    if (response.status === 404) {
+                        try {
+                            const errData = await response.json();
+                            errorMsg = errData.error || "해당 팀/회차의 출결 정보를 찾을 수 없습니다.";
+                        } catch (e) { /* JSON 파싱 실패 시 기본 메시지 사용 */ }
+                    }
+                    throw new Error(errorMsg);
+                }
+                const data = await response.json();
+                console.log("Fetched attendance data:", data);
+
+                attendanceTableBody.innerHTML = "";
+
+                const teamMembersData = data.team_members;
+                if (!teamMembersData) {
+                    alert("팀원 정보를 API 응답에서 찾을 수 없습니다. (expected 'team_members' key)");
+                    attendanceTableBody.innerHTML = `<tr><td colspan="3">팀원 정보를 가져올 수 없습니다.</td></tr>`;
+                    return;
+                }
+
+                const displayFields = [
+                    { attendanceKey: "at_leader", roleLabel: "팀장", idKey: "leader_id", nameKey: "leader_name" },
+                    { attendanceKey: "at_mate1",  roleLabel: "팀원1", idKey: "mate1_id",  nameKey: "mate1_name" },
+                    { attendanceKey: "at_mate2",  roleLabel: "팀원2", idKey: "mate2_id",  nameKey: "mate2_name" },
+                    { attendanceKey: "at_mate3",  roleLabel: "팀원3", idKey: "mate3_id",  nameKey: "mate3_name" },
+                    { attendanceKey: "at_mate4",  roleLabel: "팀원4", idKey: "mate4_id",  nameKey: "mate4_name" }
+                ];
+
+                let hasMembers = false;
+                displayFields.forEach(fieldInfo => {
+                    const studentId = teamMembersData[fieldInfo.idKey];
+                    const studentName = teamMembersData[fieldInfo.nameKey] || studentId || "-";
+                    const memberDisplay = studentId ? `${studentName} (${studentId})` : (studentName !== "-" ? studentName : "-");
+
+                    if (studentId || (fieldInfo.roleLabel === "팀장" && teamMembersData.leader_id)) {
+                        hasMembers = true;
+                        const attendanceStatusValue = data[fieldInfo.attendanceKey];
+                        let statusText = "-";
+                        let statusClass = "";
+
+                        if (attendanceStatusValue === "o" || attendanceStatusValue === "O") {
+                            statusText = "🟢 출석";
+                            statusClass = "status-present";
+                        } else if (attendanceStatusValue === "x" || attendanceStatusValue === "X") {
+                            statusText = "❌ 결석";
+                            statusClass = "status-absent";
+                        } else if (attendanceStatusValue) {
+                            statusText = attendanceStatusValue;
+                        }
+
+                        const row = document.createElement("tr");
+                        row.innerHTML = `
+                            <td>${fieldInfo.roleLabel}</td>
+                            <td>${memberDisplay}</td>
+                            <td class="${statusClass}">${statusText}</td>
+                        `;
+                        attendanceTableBody.appendChild(row);
+                    }
                 });
-            })
-            .catch(err => {
-                alert("출결 데이터를 불러오는 데 실패했습니다.");
+                 if (!hasMembers) {
+                     attendanceTableBody.innerHTML = `<tr><td colspan="3" style="text-align:center; padding:1rem;">이 팀에는 현재 배정된 팀원이 없습니다.</td></tr>`;
+                 }
+
+            } catch (err) {
+                alert("출결 데이터를 불러오는 데 실패했습니다: " + err.message);
                 console.error(err);
-            });
+                attendanceTableBody.innerHTML = `<tr><td colspan="3" style="text-align:center; padding:1rem;">데이터 로드 실패: ${err.message}</td></tr>`;
+            }
+        }
+
+        if(loadButton) {
+            loadButton.addEventListener("click", fetchAndRenderAttendance);
+        }
+
+        if (initialTeamId && roundSelect.value) {
+             fetchAndRenderAttendance();
+        } else if (!initialTeamId) { // 팀 ID가 처음부터 없는 경우
+            attendanceTableBody.innerHTML = '<tr><td colspan="3" style="text-align:center; padding: 1rem;">팀을 선택하고 회차를 조회해주세요.</td></tr>';
+        }
+
     });
-});
-
-</script>
+    </script>
 {% endblock %}
-
