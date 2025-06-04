@@ -23,7 +23,7 @@ class TeamSerializer(serializers.ModelSerializer):
             'notion_url'                # notion_url도 포함
         ]
         
-        read_only_fields = ['team_id', 'leader_name', 'mate1_name', 'mate2_name', 'mate3_name', 'mate4_name']
+        read_only_fields = ['team_id', 'team_name', 'leader_name', 'mate1_name', 'mate2_name', 'mate3_name', 'mate4_name']
 
 
     # 학생 이름을 가져오는 헬퍼 메소드 (attendance/views.py의 get_student_name_by_id와 유사)
